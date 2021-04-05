@@ -87,14 +87,15 @@ function createPokemonCache() {
                 case 3:
                     generation = _c.sent();
                     pokemon = new pokemon_1.PokemonModel(__assign(__assign({}, rawValues), { generation: generation }));
-                    pokemonCache.cache[parseInt(id)] = pokemon;
+                    if (!pokemonCache.cache[parseInt(id)]) {
+                        pokemonCache.cache[parseInt(id)] = pokemon;
+                    }
                     _c.label = 4;
                 case 4:
                     _i++;
                     return [3 /*break*/, 2];
                 case 5:
                     pokemonCache.isCacheLoaded = true;
-                    console.log('--- pokemon cache created ---');
                     return [2 /*return*/];
             }
         });
@@ -106,13 +107,13 @@ function addNormalizedData() {
     }
     console.log('--- adding normalization data to pokemon ---');
     var allPokemon = Object.values(pokemonCache.cache).map(function (p) { return p; });
+    pokemonCache.cache = {};
     allPokemon.forEach(function (pokemon) {
         var normalizedBaseExperience = stats_service_1.default.calculateNormalizedBaseExperience(pokemon);
-        var normalizedPhysicalAttributes = stats_service_1.default.calculateNormalizedPhysicalCharacteristics(pokemon);
+        var normalizedPhysicalCharacteristics = stats_service_1.default.calculateNormalizedPhysicalCharacteristics(pokemon);
         var normalizedStats = stats_service_1.default.calculatenormalizedStats(pokemon);
-        pokemonCache.cache[pokemon.id] = __assign(__assign({}, pokemon), { normalizedBaseExperience: normalizedBaseExperience,
-            normalizedPhysicalAttributes: normalizedPhysicalAttributes,
-            normalizedStats: normalizedStats });
+        pokemonCache.cache[pokemon.id] = __assign(__assign({}, pokemon), { normalizedPhysicalCharacteristics: normalizedPhysicalCharacteristics,
+            normalizedStats: normalizedStats, normalizedBaseExperience: normalizedBaseExperience.baseExperience });
     });
 }
 function getAllPokemon(options) {
@@ -160,7 +161,6 @@ function getPokemonById(id) {
                 case 0: return [4 /*yield*/, _getPokemonCache()];
                 case 1:
                     pokemonCache = _a.sent();
-                    console.log(pokemonCache[id]);
                     return [2 /*return*/, pokemonCache[id]];
             }
         });
@@ -204,14 +204,14 @@ function _filterPokemonList(pokemonCache, filter) {
         return pokemonCache;
     }
     var processedPokemon = __spreadArrays(Object.values(pokemonCache));
-    var type = filter.type, gen = filter.gen, height = filter.height, weight = filter.weight, hp = filter.hp, attack = filter.attack, defense = filter.defense, specialAttack = filter.specialAttack, specialDefense = filter.specialDefense, speed = filter.speed, ability = filter.ability, move = filter.move, isDefault = filter.isDefault, presentInGame = filter.presentInGame;
+    var type = filter.type, generations = filter.generations, height = filter.height, weight = filter.weight, hp = filter.hp, attack = filter.attack, defense = filter.defense, specialAttack = filter.specialAttack, specialDefense = filter.specialDefense, speed = filter.speed, ability = filter.ability, move = filter.move, isDefault = filter.isDefault, presentInGame = filter.presentInGame;
     if (type != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) {
             return pokemon.types.includes(type);
         });
     }
-    if (gen != undefined) {
-        processedPokemon = processedPokemon.filter(function (pokemon) { return pokemon.generation === gen; });
+    if (generations != undefined) {
+        processedPokemon = processedPokemon.filter(function (pokemon) { return generations.includes(pokemon.generation); });
     }
     if (hp != undefined) {
         var min_1 = hp[0], max_1 = hp[1];

@@ -1,17 +1,20 @@
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import pokemonController from './controllers/pokemon.controller';
 import statsController from './controllers/stats.controller';
 import { PokemonModel } from './models/pokemon';
 import generationService from './services/generation.service';
 import pokemonService from './services/pokemon.service';
-import express from 'express';
 import statsService from './services/stats.service';
+import cors from 'cors';
+import { IPokemon } from './models/shared';
 
 const app = express();
+app.use(cors());
+
 const port = 3000;
 
 function setupRoutes(): void {
-  app.get('/pokemon', async (req: Request, res: Response) => {
+  app.get('/api/v1/pokemon', async (req: Request, res: Response) => {
     try {
       const pokemon = await pokemonController.getPokemonList(req.query);
       res.send(JSON.stringify(pokemon, null, 2));
@@ -20,7 +23,7 @@ function setupRoutes(): void {
     }
   });
 
-  app.get('/pokemon/:id', async (req: Request, res: Response) => {
+  app.get('/api/v1/pokemon/:id', async (req: Request, res: Response) => {
     // could be the id or the name of the pokemon
     const idOrName = req.params.id as number | string;
 
@@ -28,7 +31,7 @@ function setupRoutes(): void {
       res.sendStatus(404);
     }
 
-    let pokemon: PokemonModel;
+    let pokemon: IPokemon;
 
     if (isNaN(idOrName as number)) {
       const name = idOrName as string;
@@ -41,7 +44,7 @@ function setupRoutes(): void {
     res.send(JSON.stringify(pokemon));
   });
 
-  app.get('/stats', async (req: Request, res: Response) => {
+  app.get('/api/v1/stats', async (req: Request, res: Response) => {
     const stats = await statsController.getAllStats();
 
     res.send(JSON.stringify(stats));

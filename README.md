@@ -57,3 +57,5 @@ Scrapes PokeApi for generaiton data in order to enrich pokemon modesl
       Users can get 1-10 random pokemon evenly spaced over the pokemon universe
 - [ ] Cache query calls
       If a user calls the pokemon endpoint with speicif query params, the response should be cached to be used the next time a user makes the same call.
+- [ ] Create a swagger for endpoints
+- [ ] write tests for services

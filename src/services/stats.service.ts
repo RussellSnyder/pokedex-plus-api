@@ -4,7 +4,7 @@ import { PokemonModel } from '../models/pokemon';
 import { AllPokemonStat, AllPokemonStats, IPokemon, MathmaticalStats, NameAndCount, PokemonPhysicalCharactersitics, PokemonStats, ServiceCache } from '../models/shared';
 import pokemonService from '../services/pokemon.service';
 
-let statCache: ServiceCache = {
+let statCache: ServiceCache<AllPokemonStats> = {
   cache: {} as AllPokemonStats,
   isCacheLoaded: false,
 }

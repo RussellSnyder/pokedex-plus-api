@@ -1,5 +1,5 @@
 import { PokemonModel } from '../models/pokemon';
-import { PokemonListOptions, PokemonListResponse, SortParam } from '../models/shared';
+import { IPokemon, PokemonListOptions, PokemonListResponse, SortParam } from '../models/shared';
 import pokemonService from '../services/pokemon.service';
 
 interface UnTypedQuery {
@@ -15,18 +15,19 @@ async function getPokemonList(
   const options = queryParams ? _parseQueryParams(queryParams) : undefined;
 
   try {
-    return await pokemonService.getAllPokemon(options);
+    const pokemon = await pokemonService.getAllPokemon(options);
+    return pokemon;
   } catch (e) {
     console.log(e);
     throw Error('Oh No!');
   }
 }
 
-async function getPokemonById(id: number): Promise<PokemonModel> {
+async function getPokemonById(id: number): Promise<IPokemon> {
   return await pokemonService.getPokemonById(id);
 }
 
-async function getPokemonByName(name: string): Promise<PokemonModel> {
+async function getPokemonByName(name: string): Promise<IPokemon> {
   return await pokemonService.getPokemonByName(name);
 }
 
@@ -43,14 +44,18 @@ function _parseQueryParams({
 
     const splitOptions = filter.toString().split(' ');
 
+    
     splitOptions.forEach((o: string) => {
       const [key, value] = o.split(':');
-
+      
       if (key === 'type') {
         options.filter!.type = value;
       }
-      if (key === 'gen') {
-        options.filter!.gen = parseInt(value);
+      if (key === 'generations') {
+        const explode = value.match(/\d+|,/g)?.map(Number);
+        const clean = explode?.filter(Number);
+
+        options.filter!.generations = clean;
       }
       if (key === 'height') {
         options.filter!.height = _createRange(value);

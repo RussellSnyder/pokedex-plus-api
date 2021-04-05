@@ -193,7 +193,7 @@ export interface PokemonActions {
 
 export interface FilterParam {
   type?: string;
-  gen?: number;
+  generations?: number[];
   height?: [number, number];
   weight?: [number, number];
   hp?: [number, number];
@@ -263,8 +263,8 @@ export interface AllPokemonStats {
   defaultPokemonCount: number;
 }
 
-export interface ServiceCache {
-  cache: any,
+export interface ServiceCache<T> {
+  cache: T,
   isCacheLoaded: boolean,
 }
 

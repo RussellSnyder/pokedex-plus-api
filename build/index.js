@@ -39,17 +39,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = __importDefault(require("express"));
 var pokemon_controller_1 = __importDefault(require("./controllers/pokemon.controller"));
 var stats_controller_1 = __importDefault(require("./controllers/stats.controller"));
 var generation_service_1 = __importDefault(require("./services/generation.service"));
 var pokemon_service_1 = __importDefault(require("./services/pokemon.service"));
-var express_1 = __importDefault(require("express"));
 var stats_service_1 = __importDefault(require("./services/stats.service"));
+var cors_1 = __importDefault(require("cors"));
 var app = express_1.default();
+app.use(cors_1.default());
 var port = 3000;
 function setupRoutes() {
     var _this = this;
-    app.get('/pokemon', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    app.get('/api/v1/pokemon', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var pokemon, _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -68,7 +70,7 @@ function setupRoutes() {
             }
         });
     }); });
-    app.get('/pokemon/:id', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    app.get('/api/v1/pokemon/:id', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var idOrName, pokemon, name, id;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -95,7 +97,7 @@ function setupRoutes() {
             }
         });
     }); });
-    app.get('/stats', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    app.get('/api/v1/stats', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
         var stats;
         return __generator(this, function (_a) {
             switch (_a.label) {

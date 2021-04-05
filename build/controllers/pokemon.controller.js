@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var pokemon_service_1 = __importDefault(require("../services/pokemon.service"));
 function getPokemonList(queryParams) {
     return __awaiter(this, void 0, void 0, function () {
-        var options, e_1;
+        var options, pokemon, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -51,7 +51,9 @@ function getPokemonList(queryParams) {
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, pokemon_service_1.default.getAllPokemon(options)];
-                case 2: return [2 /*return*/, _a.sent()];
+                case 2:
+                    pokemon = _a.sent();
+                    return [2 /*return*/, pokemon];
                 case 3:
                     e_1 = _a.sent();
                     console.log(e_1);
@@ -88,12 +90,17 @@ function _parseQueryParams(_a) {
         options.filter = {};
         var splitOptions = filter.toString().split(' ');
         splitOptions.forEach(function (o) {
-            var _a = o.split(':'), key = _a[0], value = _a[1];
+            var _a;
+            var _b = o.split(':'), key = _b[0], value = _b[1];
+            console.log(key, value);
             if (key === 'type') {
                 options.filter.type = value;
             }
-            if (key === 'gen') {
-                options.filter.gen = parseInt(value);
+            if (key === 'generations') {
+                var explode = (_a = value.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);
+                var clean = explode === null || explode === void 0 ? void 0 : explode.filter(Number);
+                console.log({ clean: clean });
+                options.filter.generations = clean;
             }
             if (key === 'height') {
                 options.filter.height = _createRange(value);

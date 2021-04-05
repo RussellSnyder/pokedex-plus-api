@@ -3,22 +3,21 @@ import {
   FilterParam,
   PokemonListOptions,
   PokemonListResponse,
-  PokeApiPokemonResponse,
   ServiceCache,
   SortParam,
-  PokemonConstructorArguments,
   PokemonJsonFormat,
+  IPokemon,
 } from '../models/shared';
 import pokemonRepo from '../repos/pokemon.repo';
 import generationService from './generation.service';
 import statsService from './stats.service';
 
 export interface PokemonCache {
-  [key: number]: PokemonModel;
+  [key: number]: IPokemon;
 }
 
-let pokemonCache: ServiceCache = {
-  cache: {} as PokemonCache,
+let pokemonCache: ServiceCache<PokemonCache> = {
+  cache: {},
   isCacheLoaded: false,
 }
 
@@ -39,11 +38,13 @@ async function createPokemonCache() {
       );
 
     const pokemon = new PokemonModel({ ...rawValues, generation });
-    pokemonCache.cache[parseInt(id)] = pokemon;
+
+    if (!pokemonCache.cache[parseInt(id)]) {
+      pokemonCache.cache[parseInt(id)] = pokemon;
+    }
   }
 
   pokemonCache.isCacheLoaded = true;
-  console.log('--- pokemon cache created ---');
 }
 
 function addNormalizedData() {
@@ -52,18 +53,20 @@ function addNormalizedData() {
   }
   console.log('--- adding normalization data to pokemon ---')
 
-  const allPokemon = Object.values(pokemonCache.cache).map(p => p) as PokemonModel[];
+  const allPokemon = Object.values(pokemonCache.cache).map(p => p) as IPokemon[];
+
+  pokemonCache.cache = {};
 
   allPokemon.forEach(pokemon => {
     const normalizedBaseExperience = statsService.calculateNormalizedBaseExperience(pokemon)
-    const normalizedPhysicalAttributes = statsService.calculateNormalizedPhysicalCharacteristics(pokemon)
+    const normalizedPhysicalCharacteristics = statsService.calculateNormalizedPhysicalCharacteristics(pokemon)
     const normalizedStats = statsService.calculatenormalizedStats(pokemon)
 
     pokemonCache.cache[pokemon.id] = {
       ...pokemon,
-      normalizedBaseExperience,
-      normalizedPhysicalAttributes,
+      normalizedPhysicalCharacteristics,
       normalizedStats,
+      normalizedBaseExperience: normalizedBaseExperience.baseExperience,
     }
   })
 }
@@ -106,14 +109,13 @@ async function getAllPokemon(
   };
 }
 
-async function getPokemonById(id: number): Promise<PokemonModel> {
+async function getPokemonById(id: number): Promise<IPokemon> {
   const pokemonCache = await _getPokemonCache();
 
-  console.log(pokemonCache[id]);
   return pokemonCache[id];
 }
 
-async function getPokemonByName(name: string): Promise<PokemonModel> {
+async function getPokemonByName(name: string): Promise<IPokemon> {
   const pokemonCache = await _getPokemonCache();
 
   return Object.values(pokemonCache).find(p => p.name === name);
@@ -153,7 +155,7 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
 
   const {
     type,
-    gen,
+    generations,
     height,
     weight,
     hp,
@@ -169,42 +171,42 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
   } = filter;
 
   if (type != undefined) {
-    processedPokemon = processedPokemon.filter((pokemon: PokemonModel) =>
+    processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
       pokemon.types.includes(type),
     );
   }
 
-  if (gen != undefined) {
+  if (generations != undefined) {
     processedPokemon = processedPokemon.filter(
-      (pokemon: PokemonModel) => pokemon.generation === gen,
+      (pokemon: IPokemon) => generations.includes(pokemon.generation),
     );
   }
 
   if (hp != undefined) {
     const [min, max] = hp;
     processedPokemon = processedPokemon.filter(
-      ({ stats }: PokemonModel) => stats.hp && min <= stats.hp && stats.hp <= max,
+      ({ stats }: IPokemon) => stats.hp && min <= stats.hp && stats.hp <= max,
     );
   }
 
   if (attack != undefined) {
     const [min, max] = attack;
     processedPokemon = processedPokemon.filter(
-      ({ stats }: PokemonModel) => stats.attack && min <= stats.attack && stats.attack <= max,
+      ({ stats }: IPokemon) => stats.attack && min <= stats.attack && stats.attack <= max,
     );
   }
 
   if (defense != undefined) {
     const [min, max] = defense;
     processedPokemon = processedPokemon.filter(
-      ({ stats }: PokemonModel) => stats.defense && min <= stats.defense && stats.defense <= max,
+      ({ stats }: IPokemon) => stats.defense && min <= stats.defense && stats.defense <= max,
     );
   }
 
   if (specialAttack != undefined) {
     const [min, max] = specialAttack;
     processedPokemon = processedPokemon.filter(
-      ({ stats }: PokemonModel) =>
+      ({ stats }: IPokemon) =>
         stats.specialAttack && min <= stats.specialAttack && stats.specialAttack <= max,
     );
   }
@@ -212,7 +214,7 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
   if (specialDefense != undefined) {
     const [min, max] = specialDefense;
     processedPokemon = processedPokemon.filter(
-      ({ stats }: PokemonModel) =>
+      ({ stats }: IPokemon) =>
         stats.specialDefense && min <= stats.specialDefense && stats.specialDefense <= max,
     );
   }
