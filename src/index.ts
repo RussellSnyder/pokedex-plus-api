@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import pokemonController from './controllers/pokemon.controller';
 import statsController from './controllers/stats.controller';
-import { PokemonModel } from './models/pokemon';
 import generationService from './services/generation.service';
 import pokemonService from './services/pokemon.service';
 import statsService from './services/stats.service';

@@ -1,3 +1,4 @@
+import { ServiceCache } from '../models/backend';
 import { GenerationResponse } from '../models/shared';
 import generationRepo from '../repos/generation.repo';
 
@@ -5,25 +6,27 @@ export interface GenerationCache {
   [key: string]: number; // pokemon name and generation number
 }
 
-let generationCache: GenerationCache;
-let generationCacheFilled = false;
+const generationCache: ServiceCache<GenerationCache> = {
+  cache: {} as GenerationCache,
+  isCacheLoaded: false,
+};
 
-async function createGenerationCache() {
-  generationCacheFilled = false;
+async function createGenerationCache(): Promise<void> {
+  generationCache.isCacheLoaded = false;
 
   console.log('--- creating generation cache ---');
 
   const pokemonGenerationCollection: GenerationResponse[] = await generationRepo.getAllGenerations();
 
-  generationCache = {};
+  generationCache.cache = {};
 
   for (const [id, generation] of Object.entries(pokemonGenerationCollection)) {
     generation.pokemon_species.forEach(pokemon => {
-      generationCache[pokemon.name] = parseInt(id);
+      generationCache.cache[pokemon.name] = parseInt(id);
     });
   }
 
-  generationCacheFilled = true;
+  generationCache.isCacheLoaded = true;
   console.log('--- generation cache created ---');
 }
 
@@ -34,13 +37,13 @@ async function getGenerationOfPokemon(pokemonName: string): Promise<number> {
 }
 
 async function _getGnerationCache(): Promise<GenerationCache> {
-  if (generationCacheFilled) {
-    return generationCache;
+  if (generationCache.isCacheLoaded) {
+    return generationCache.cache;
   }
 
   await createGenerationCache();
 
-  return generationCache;
+  return generationCache.cache;
 }
 
 export default {

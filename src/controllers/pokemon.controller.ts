@@ -1,12 +1,17 @@
-import { PokemonModel } from '../models/pokemon';
-import { IPokemon, PokemonListOptions, PokemonListResponse, SortParam } from '../models/shared';
+import {
+  FilterParam,
+  IPokemon,
+  PokemonListOptions,
+  PokemonListResponse,
+  SortParam,
+} from '../models/shared';
 import pokemonService from '../services/pokemon.service';
 
 interface UnTypedQuery {
-  filter?: any;
-  sort?: any;
-  offset?: any;
-  limit?: any;
+  filter?: string;
+  sort?: string;
+  offset?: string;
+  limit?: string;
 }
 
 async function getPokemonList(
@@ -40,70 +45,66 @@ function _parseQueryParams({
   const options: PokemonListOptions = {};
 
   if (filter) {
-    options.filter = {};
+    options.filter = {} as FilterParam;
 
     const splitOptions = filter.toString().split(' ');
 
-    
     splitOptions.forEach((o: string) => {
       const [key, value] = o.split(':');
-      
-      if (key === 'type') {
-        options.filter!.type = value;
-      }
-      if (key === 'generations') {
-        const explode = value.match(/\d+|,/g)?.map(Number);
-        const clean = explode?.filter(Number);
 
-        options.filter!.generations = clean;
+      if (!options.filter) {
+        return;
       }
-      if (key === 'height') {
-        options.filter!.height = _createRange(value);
-      }
-      if (key === 'weight') {
-        options.filter!.weight = _createRange(value);
-      }
-      if (key === 'hp') {
-        options.filter!.hp = _createRange(value);
-      }
-      if (key === 'attack') {
-        options.filter!.attack = _createRange(value);
-      }
-      if (key === 'defense') {
-        options.filter!.defense = _createRange(value);
-      }
-      if (key === 'specialAttack') {
-        options.filter!.specialAttack = _createRange(value);
-      }
-      if (key === 'specialDefense') {
-        options.filter!.specialDefense = _createRange(value);
-      }
-      if (key === 'speed') {
-        options.filter!.speed = _createRange(value);
-      }
-      if (key === 'ability') {
-        options.filter!.ability = value;
-      }
-      if (key === 'move') {
-        options.filter!.move = value;
-      }
-      if (key === 'isDefault' || key === 'isdefault') {
-        let bool;
-        const maybeNumber = parseInt(value);
-        if (isNaN(maybeNumber)) {
-          bool = value === 'true' ? true : false;
-        } else {
-          bool = maybeNumber === 0 ? false : true;
-        }
 
-        options.filter!.isDefault = bool;
-      }
-      if (key === 'presentInGame') {
-        options.filter!.presentInGame = value;
+      switch (key) {
+        case 'type':
+          options.filter.type = value;
+          break;
+        case 'generations':
+          options.filter.generations = _parseGenerationString(value);
+          break;
+        case 'height':
+          options.filter.height = _createRange(value);
+          break;
+        case 'weight':
+          options.filter.weight = _createRange(value);
+          break;
+        case 'hp':
+          options.filter.hp = _createRange(value);
+          break;
+        case 'attack':
+          options.filter.attack = _createRange(value);
+          break;
+        case 'defense':
+          options.filter.defense = _createRange(value);
+          break;
+        case 'specialAttack':
+          options.filter.specialAttack = _createRange(value);
+          break;
+        case 'specialDefense':
+          options.filter.specialDefense = _createRange(value);
+          break;
+        case 'speed':
+          options.filter.speed = _createRange(value);
+          break;
+        case 'ability':
+          options.filter.ability = value;
+          break;
+        case 'move':
+          options.filter.move = value;
+          break;
+        case 'isDefault':
+          options.filter.isDefault = _parseStringBool(value);
+          break;
+        case 'isdefault':
+          options.filter.isDefault = _parseStringBool(value);
+          break;
+        case 'presentInGame':
+          options.filter.presentInGame = value;
+          break;
       }
     });
   }
-
   if (sort) {
     options.sort = sort as SortParam;
   }
@@ -119,6 +120,27 @@ function _parseQueryParams({
   return options;
 }
 
+const _parseGenerationString = (value: string): number[] | undefined => {
+  const explode = value.match(/\d+|,/g)?.map(Number);
+
+  if (explode) {
+    return explode.filter(Number);
+  }
+
+  return;
+};
+
+const _parseStringBool = (value: string): boolean => {
+  let bool;
+  const maybeNumber = parseInt(value);
+  if (isNaN(maybeNumber)) {
+    bool = value === 'true' ? true : false;
+  } else {
+    bool = maybeNumber === 0 ? false : true;
+  }
+
+  return bool;
+};
 const _createRange = (lowHigh: string): [number, number] => {
   const result = lowHigh.match(/\d+|,/g)?.map(Number) as [
     unknown,

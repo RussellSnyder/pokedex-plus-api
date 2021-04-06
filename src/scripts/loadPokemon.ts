@@ -37,14 +37,22 @@ async function _getAllPokemonNamedApiResources(
 
 const createPokemonJson = async () => {
   const count = await _getPokemonCount();
-  const res = await _getAllPokemonNamedApiResources(count!);
+
+  if (!count) {
+    return;
+  }
+
+  const res = await _getAllPokemonNamedApiResources(count);
 
   const urls = res?.data.results.map(d => d.url);
 
+  if (!urls) {
+    return;
+  }
   const fetchedpokemon: { [key: number]: PokeApiPokemonResponse } = {};
   let fetchCount = 0;
 
-  for (const url of urls!) {
+  for (const url of urls) {
     try {
       const res = await axios.get(url);
 
@@ -65,20 +73,21 @@ const createPokemonJson = async () => {
 
   // github only allows 100mb files
   // remove version groups from moves bc we dont use it anyway
-  const trimmedData = Object.entries(fetchedpokemon).map(([id, p]) => {
+  const trimmedData = Object.entries(fetchedpokemon).map(([_, p]) => {
     const moves = p.moves.map(move => move.move);
     return {
       ...p,
       moves,
-    }
-  })
+    };
+  });
 
-  
   const pokemonData = JSON.stringify(
     {
       lastUpdated: Date.now(),
       pokemon: trimmedData,
-    }, null, 2
+    },
+    null,
+    2,
   );
 
   try {

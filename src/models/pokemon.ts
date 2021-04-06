@@ -3,7 +3,6 @@ import {
   NamedAPIResource,
   IPokemon,
   PokemonAbility,
-  PokeApiPokemonResponse,
   PokemonSprite,
   PokemonSpriteSet,
   PokemonResponseType,
@@ -33,8 +32,8 @@ export class PokemonModel implements IPokemon {
   actions: PokemonActions;
 
   physicalCharacteristics: PokemonPhysicalCharactersitics;
-  normalizedPhysicalCharacteristics!: PokemonPhysicalCharactersitics;  
-  
+  normalizedPhysicalCharacteristics!: PokemonPhysicalCharactersitics;
+
   sprites: PokemonSpriteSet;
   stats: PokemonStats = {};
   normalizedStats!: PokemonStats;
@@ -46,7 +45,7 @@ export class PokemonModel implements IPokemon {
     this.physicalCharacteristics = {
       height: data.height,
       weight: data.weight,
-    }
+    };
 
     this.types = data.types.map((t: PokemonResponseType) => t.type.name);
     this.forms = data.forms.map((form: NamedAPIResource) => form.name);
@@ -57,15 +56,18 @@ export class PokemonModel implements IPokemon {
     this.actions = {
       abilities: data.abilities.map((t: PokemonAbility) => t.ability.name),
       moves: data.moves.map(m => m.name),
-    }
+    };
     this.sprites = this._filterNullsFromSprites(data.sprites);
 
-    const stats = data.stats.map(({ stat, base_stat }) => ({ name: camelCase(stat.name) as keyof PokemonStats, value: base_stat }));
-    stats.forEach(({name, value}) => {
-    if (name && value) {
+    const stats = data.stats.map(({ stat, base_stat }) => ({
+      name: camelCase(stat.name) as keyof PokemonStats,
+      value: base_stat,
+    }));
+    stats.forEach(({ name, value }) => {
+      if (name && value) {
         this.stats[name] = value;
-       }
-      });
+      }
+    });
 
     this.generation = data.generation;
   }

@@ -31,10 +31,14 @@ const createGenerationJson = async () => {
 
   const urls = res?.data.results.map(d => d.url);
 
+  if (!urls) {
+    return;
+  }
+
   const fetchedGenerations: { [key: number]: GenerationResponse } = {};
   let fetchCount = 0;
 
-  for (const url of urls!) {
+  for (const url of urls) {
     try {
       const res = await axios.get(url);
 

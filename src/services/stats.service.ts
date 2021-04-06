@@ -1,15 +1,23 @@
 import flattenDeep from 'lodash.flattendeep';
 import stats from 'stats-lite';
-import { PokemonModel } from '../models/pokemon';
-import { AllPokemonStat, AllPokemonStats, IPokemon, MathmaticalStats, NameAndCount, PokemonPhysicalCharactersitics, PokemonStats, ServiceCache } from '../models/shared';
+import { ServiceCache } from '../models/backend';
+import {
+  AllPokemonStat,
+  AllPokemonStats,
+  IPokemon,
+  MathmaticalStats,
+  NameAndCount,
+  PokemonPhysicalCharactersitics,
+  PokemonStats,
+} from '../models/shared';
 import pokemonService from '../services/pokemon.service';
 
-let statCache: ServiceCache<AllPokemonStats> = {
+const statCache: ServiceCache<AllPokemonStats> = {
   cache: {} as AllPokemonStats,
   isCacheLoaded: false,
-}
+};
 
-async function createStatCache() {
+async function createStatCache(): Promise<void> {
   statCache.isCacheLoaded = false;
 
   const pokemonList = await pokemonService.getAllPokemon();
@@ -17,21 +25,47 @@ async function createStatCache() {
 
   statCache.cache = {
     types: _calculateNameAndCount(flattenDeep(pokemon.map(p => p.types))),
-    abilities: _calculateNameAndCount(flattenDeep(pokemon.map(p => p.actions.abilities))),
-    moves: _calculateNameAndCount(flattenDeep(pokemon.map(p => p.actions.moves))),
+    abilities: _calculateNameAndCount(
+      flattenDeep(pokemon.map(p => p.actions.abilities)),
+    ),
+    moves: _calculateNameAndCount(
+      flattenDeep(pokemon.map(p => p.actions.moves)),
+    ),
     pokemonInGeneration: _calculateNameAndCount(pokemon.map(p => p.generation)),
-    pokemonPresentInGame: _calculateNameAndCount(flattenDeep(pokemon.map(p => p.gamesWherePresent))),
-    weight: _calculateAllPokemonStat(pokemon.map(p => p.physicalCharacteristics.weight)),
-    height: _calculateAllPokemonStat(pokemon.map(p => p.physicalCharacteristics.height)),
-    hp: _calculateAllPokemonStat(pokemon.map(p => p.stats.hp).filter(Boolean) as number[]),
-    attack: _calculateAllPokemonStat(pokemon.map(p => p.stats.attack).filter(Boolean) as number[]),
-    defense: _calculateAllPokemonStat(pokemon.map(p => p.stats.defense).filter(Boolean) as number[]),
-    specialAttack: _calculateAllPokemonStat(pokemon.map(p => p.stats.specialAttack).filter(Boolean) as number[]),
-    specialDefense: _calculateAllPokemonStat(pokemon.map(p => p.stats.specialDefense).filter(Boolean) as number[]),
-    speed: _calculateAllPokemonStat(pokemon.map(p => p.stats.speed).filter(Boolean) as number[]),
-    baseExperience: _calculateAllPokemonStat(pokemon.map(p => p.baseExperience)),
-    defaultPokemonCount: pokemon.map(p => p.isDefault ? 1 : 0 as number).reduce((acc, curr) => acc + curr),
-  }
+    pokemonPresentInGame: _calculateNameAndCount(
+      flattenDeep(pokemon.map(p => p.gamesWherePresent)),
+    ),
+    weight: _calculateAllPokemonStat(
+      pokemon.map(p => p.physicalCharacteristics.weight),
+    ),
+    height: _calculateAllPokemonStat(
+      pokemon.map(p => p.physicalCharacteristics.height),
+    ),
+    hp: _calculateAllPokemonStat(
+      pokemon.map(p => p.stats.hp).filter(Boolean) as number[],
+    ),
+    attack: _calculateAllPokemonStat(
+      pokemon.map(p => p.stats.attack).filter(Boolean) as number[],
+    ),
+    defense: _calculateAllPokemonStat(
+      pokemon.map(p => p.stats.defense).filter(Boolean) as number[],
+    ),
+    specialAttack: _calculateAllPokemonStat(
+      pokemon.map(p => p.stats.specialAttack).filter(Boolean) as number[],
+    ),
+    specialDefense: _calculateAllPokemonStat(
+      pokemon.map(p => p.stats.specialDefense).filter(Boolean) as number[],
+    ),
+    speed: _calculateAllPokemonStat(
+      pokemon.map(p => p.stats.speed).filter(Boolean) as number[],
+    ),
+    baseExperience: _calculateAllPokemonStat(
+      pokemon.map(p => p.baseExperience),
+    ),
+    defaultPokemonCount: pokemon
+      .map(p => (p.isDefault ? 1 : (0 as number)))
+      .reduce((acc, curr) => acc + curr),
+  };
 
   statCache.isCacheLoaded = true;
 }
@@ -46,29 +80,81 @@ async function getAllStats(): Promise<AllPokemonStats> {
   return statCache.cache;
 }
 
-function calculateNormalizedPhysicalCharacteristics(pokemon: IPokemon): PokemonPhysicalCharactersitics {
+function calculateNormalizedPhysicalCharacteristics(
+  pokemon: IPokemon,
+): PokemonPhysicalCharactersitics {
   return {
-    height: _normalizeValue(pokemon.physicalCharacteristics.height, statCache.cache.height.min, statCache.cache.height.max),
-    weight: _normalizeValue(pokemon.physicalCharacteristics.weight, statCache.cache.weight.min, statCache.cache.weight.max),
-  }
+    height: _normalizeValue(
+      pokemon.physicalCharacteristics.height,
+      statCache.cache.height.min,
+      statCache.cache.height.max,
+    ),
+    weight: _normalizeValue(
+      pokemon.physicalCharacteristics.weight,
+      statCache.cache.weight.min,
+      statCache.cache.weight.max,
+    ),
+  };
 }
 
-function calculateNormalizedBaseExperience(pokemon: IPokemon): { baseExperience: number } {
-  const baseExperience = _normalizeValue(pokemon.baseExperience, statCache.cache.baseExperience.min, statCache.cache.baseExperience.max);
+function calculateNormalizedBaseExperience(
+  pokemon: IPokemon,
+): { baseExperience: number } {
+  const baseExperience = _normalizeValue(
+    pokemon.baseExperience,
+    statCache.cache.baseExperience.min,
+    statCache.cache.baseExperience.max,
+  );
   return {
-    baseExperience
-  }
+    baseExperience,
+  };
 }
 
 function calculatenormalizedStats(pokemon: IPokemon): PokemonStats {
   return {
-    hp: pokemon.stats.hp ? _normalizeValue(pokemon.stats.hp, statCache.cache.hp.min, statCache.cache.hp.max) : undefined,
-    attack: pokemon.stats.attack ?_normalizeValue(pokemon.stats.attack, statCache.cache.attack.min, statCache.cache.attack.max) : undefined,
-    defense: pokemon.stats.defense ? _normalizeValue(pokemon.stats.defense, statCache.cache.defense.min, statCache.cache.defense.max) : undefined,
-    specialAttack: pokemon.stats.specialAttack ? _normalizeValue(pokemon.stats.specialAttack, statCache.cache.specialAttack.min, statCache.cache.specialAttack.max) : undefined,
-    specialDefense: pokemon.stats.specialDefense ? _normalizeValue(pokemon.stats.specialDefense, statCache.cache.specialDefense.min, statCache.cache.specialDefense.max) : undefined,
-    speed: pokemon.stats.speed ? _normalizeValue(pokemon.stats.speed, statCache.cache.speed.min, statCache.cache.speed.max) : undefined,
-  }
+    hp: pokemon.stats.hp
+      ? _normalizeValue(
+          pokemon.stats.hp,
+          statCache.cache.hp.min,
+          statCache.cache.hp.max,
+        )
+      : undefined,
+    attack: pokemon.stats.attack
+      ? _normalizeValue(
+          pokemon.stats.attack,
+          statCache.cache.attack.min,
+          statCache.cache.attack.max,
+        )
+      : undefined,
+    defense: pokemon.stats.defense
+      ? _normalizeValue(
+          pokemon.stats.defense,
+          statCache.cache.defense.min,
+          statCache.cache.defense.max,
+        )
+      : undefined,
+    specialAttack: pokemon.stats.specialAttack
+      ? _normalizeValue(
+          pokemon.stats.specialAttack,
+          statCache.cache.specialAttack.min,
+          statCache.cache.specialAttack.max,
+        )
+      : undefined,
+    specialDefense: pokemon.stats.specialDefense
+      ? _normalizeValue(
+          pokemon.stats.specialDefense,
+          statCache.cache.specialDefense.min,
+          statCache.cache.specialDefense.max,
+        )
+      : undefined,
+    speed: pokemon.stats.speed
+      ? _normalizeValue(
+          pokemon.stats.speed,
+          statCache.cache.speed.min,
+          statCache.cache.speed.max,
+        )
+      : undefined,
+  };
 }
 
 function _normalizeValue(value: number, min: number, max: number) {
@@ -78,8 +164,8 @@ function _normalizeValue(value: number, min: number, max: number) {
 function _calculateAllPokemonStat(values: number[]): AllPokemonStat {
   return {
     nameAndCounts: _calculateNameAndCount(values),
-    ..._calculateMathmaticalStats(values)
-  }
+    ..._calculateMathmaticalStats(values),
+  };
 }
 
 function _calculateMathmaticalStats(values: number[]): MathmaticalStats {
@@ -94,10 +180,10 @@ function _calculateMathmaticalStats(values: number[]): MathmaticalStats {
     sampleStdev: stats.sampleStdev(values),
     max: sorted[sorted.length - 1],
     min: sorted[0],
-  }
+  };
 }
 
-function _calculateNameAndCount(values: any[]): NameAndCount {
+function _calculateNameAndCount(values: (string | number)[]): NameAndCount {
   const nameAndCount: NameAndCount = {};
 
   values.forEach(value => {
@@ -109,7 +195,7 @@ function _calculateNameAndCount(values: any[]): NameAndCount {
 
   // order by count
   return Object.entries(nameAndCount)
-    .sort(([,a], [,b]) => a-b)
+    .sort(([, a], [, b]) => a - b)
     .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 }
 

@@ -92,14 +92,12 @@ function _parseQueryParams(_a) {
         splitOptions.forEach(function (o) {
             var _a;
             var _b = o.split(':'), key = _b[0], value = _b[1];
-            console.log(key, value);
             if (key === 'type') {
                 options.filter.type = value;
             }
             if (key === 'generations') {
                 var explode = (_a = value.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);
                 var clean = explode === null || explode === void 0 ? void 0 : explode.filter(Number);
-                console.log({ clean: clean });
                 options.filter.generations = clean;
             }
             if (key === 'height') {

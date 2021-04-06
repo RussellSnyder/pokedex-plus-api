@@ -102,8 +102,8 @@ export interface PokemonResponseStat {
   base_stat: number;
   effort: number;
   stat: {
-    name: keyof PokemonStats,
-    url: string
+    name: keyof PokemonStats;
+    url: string;
   };
 }
 
@@ -129,22 +129,19 @@ export interface PokeApiPokemonResponse {
   weight: number;
 }
 
-export interface PokemonJsonFormat extends Omit<PokeApiPokemonResponse, 'moves'> {
-  moves: NamedAPIResource[],
+export interface PokemonJsonFormat
+  extends Omit<PokeApiPokemonResponse, 'moves'> {
+  moves: NamedAPIResource[];
 }
 
 export interface PokemonConstructorArguments extends PokemonJsonFormat {
-  generation: number
+  generation: number;
 }
 
 export interface GenerationResponse {
   id: number;
   pokemon_species: NamedAPIResource[];
   name: string;
-}
-
-export interface NormalizedPokemon {
-
 }
 
 export interface IPokemon {
@@ -161,14 +158,14 @@ export interface IPokemon {
   forms: string[];
   types: string[];
 
-  actions: PokemonActions,
+  actions: PokemonActions;
 
   stats: PokemonStats;
   normalizedStats: PokemonStats;
 
-  physicalCharacteristics: PokemonPhysicalCharactersitics,
-  normalizedPhysicalCharacteristics: PokemonPhysicalCharactersitics,
-  
+  physicalCharacteristics: PokemonPhysicalCharactersitics;
+  normalizedPhysicalCharacteristics: PokemonPhysicalCharactersitics;
+
   sprites: PokemonSpriteSet;
 }
 
@@ -182,13 +179,13 @@ export interface PokemonStats {
 }
 
 export interface PokemonPhysicalCharactersitics {
-  height: number,
-  weight: number,
+  height: number;
+  weight: number;
 }
 
 export interface PokemonActions {
-  moves: string[],
-  abilities: string[],
+  moves: string[];
+  abilities: string[];
 }
 
 export interface FilterParam {
@@ -229,18 +226,18 @@ export interface NameAndCount {
 }
 
 export interface MathmaticalStats {
-  mean: number,
-  median: number,
-  mode: number,
-  variance: number,
-  stdev: number,
-  sampleStdev: number,
-  max: number,
-  min: number,
+  mean: number;
+  median: number;
+  mode: number;
+  variance: number;
+  stdev: number;
+  sampleStdev: number;
+  max: number;
+  min: number;
 }
 
 export interface AllPokemonStat extends MathmaticalStats {
-  nameAndCounts: NameAndCount,
+  nameAndCounts: NameAndCount;
 }
 
 export interface AllPokemonStats {
@@ -261,11 +258,6 @@ export interface AllPokemonStats {
   baseExperience: AllPokemonStat;
 
   defaultPokemonCount: number;
-}
-
-export interface ServiceCache<T> {
-  cache: T,
-  isCacheLoaded: boolean,
 }
 
 export interface PokemonListResponse {

@@ -40,30 +40,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var generation_repo_1 = __importDefault(require("../repos/generation.repo"));
-var generationCache;
-var generationCacheFilled = false;
+var generationCache = {
+    cache: {},
+    isCacheLoaded: false,
+};
 function createGenerationCache() {
     return __awaiter(this, void 0, void 0, function () {
         var pokemonGenerationCollection, _loop_1, _i, _a, _b, id, generation;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    generationCacheFilled = false;
+                    generationCache.isCacheLoaded = false;
                     console.log('--- creating generation cache ---');
                     return [4 /*yield*/, generation_repo_1.default.getAllGenerations()];
                 case 1:
                     pokemonGenerationCollection = _c.sent();
-                    generationCache = {};
+                    generationCache.cache = {};
                     _loop_1 = function (id, generation) {
                         generation.pokemon_species.forEach(function (pokemon) {
-                            generationCache[pokemon.name] = parseInt(id);
+                            generationCache.cache[pokemon.name] = parseInt(id);
                         });
                     };
                     for (_i = 0, _a = Object.entries(pokemonGenerationCollection); _i < _a.length; _i++) {
                         _b = _a[_i], id = _b[0], generation = _b[1];
                         _loop_1(id, generation);
                     }
-                    generationCacheFilled = true;
+                    generationCache.isCacheLoaded = true;
                     console.log('--- generation cache created ---');
                     return [2 /*return*/];
             }
@@ -88,13 +90,13 @@ function _getGnerationCache() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (generationCacheFilled) {
-                        return [2 /*return*/, generationCache];
+                    if (generationCache.isCacheLoaded) {
+                        return [2 /*return*/, generationCache.cache];
                     }
                     return [4 /*yield*/, createGenerationCache()];
                 case 1:
                     _a.sent();
-                    return [2 /*return*/, generationCache];
+                    return [2 /*return*/, generationCache.cache];
             }
         });
     });
