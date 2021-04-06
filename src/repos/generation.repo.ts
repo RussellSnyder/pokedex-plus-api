@@ -1,6 +1,6 @@
 import fs from 'fs';
 import util from 'util';
-import { GenerationResponse } from '../models/shared';
+import { GenerationResponse } from '../models/isomphic';
 
 const readfile = util.promisify(fs.readFile);
 

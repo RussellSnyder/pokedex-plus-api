@@ -83,7 +83,9 @@ function createStatCache() {
                         specialDefense: _calculateAllPokemonStat(pokemon.map(function (p) { return p.stats.specialDefense; }).filter(Boolean)),
                         speed: _calculateAllPokemonStat(pokemon.map(function (p) { return p.stats.speed; }).filter(Boolean)),
                         baseExperience: _calculateAllPokemonStat(pokemon.map(function (p) { return p.baseExperience; })),
-                        defaultPokemonCount: pokemon.map(function (p) { return p.isDefault ? 1 : 0; }).reduce(function (acc, curr) { return acc + curr; }),
+                        defaultPokemonCount: pokemon
+                            .map(function (p) { return (p.isDefault ? 1 : 0); })
+                            .reduce(function (acc, curr) { return acc + curr; }),
                     };
                     statCache.isCacheLoaded = true;
                     return [2 /*return*/];
@@ -116,17 +118,29 @@ function calculateNormalizedPhysicalCharacteristics(pokemon) {
 function calculateNormalizedBaseExperience(pokemon) {
     var baseExperience = _normalizeValue(pokemon.baseExperience, statCache.cache.baseExperience.min, statCache.cache.baseExperience.max);
     return {
-        baseExperience: baseExperience
+        baseExperience: baseExperience,
     };
 }
 function calculatenormalizedStats(pokemon) {
     return {
-        hp: pokemon.stats.hp ? _normalizeValue(pokemon.stats.hp, statCache.cache.hp.min, statCache.cache.hp.max) : undefined,
-        attack: pokemon.stats.attack ? _normalizeValue(pokemon.stats.attack, statCache.cache.attack.min, statCache.cache.attack.max) : undefined,
-        defense: pokemon.stats.defense ? _normalizeValue(pokemon.stats.defense, statCache.cache.defense.min, statCache.cache.defense.max) : undefined,
-        specialAttack: pokemon.stats.specialAttack ? _normalizeValue(pokemon.stats.specialAttack, statCache.cache.specialAttack.min, statCache.cache.specialAttack.max) : undefined,
-        specialDefense: pokemon.stats.specialDefense ? _normalizeValue(pokemon.stats.specialDefense, statCache.cache.specialDefense.min, statCache.cache.specialDefense.max) : undefined,
-        speed: pokemon.stats.speed ? _normalizeValue(pokemon.stats.speed, statCache.cache.speed.min, statCache.cache.speed.max) : undefined,
+        hp: pokemon.stats.hp
+            ? _normalizeValue(pokemon.stats.hp, statCache.cache.hp.min, statCache.cache.hp.max)
+            : undefined,
+        attack: pokemon.stats.attack
+            ? _normalizeValue(pokemon.stats.attack, statCache.cache.attack.min, statCache.cache.attack.max)
+            : undefined,
+        defense: pokemon.stats.defense
+            ? _normalizeValue(pokemon.stats.defense, statCache.cache.defense.min, statCache.cache.defense.max)
+            : undefined,
+        specialAttack: pokemon.stats.specialAttack
+            ? _normalizeValue(pokemon.stats.specialAttack, statCache.cache.specialAttack.min, statCache.cache.specialAttack.max)
+            : undefined,
+        specialDefense: pokemon.stats.specialDefense
+            ? _normalizeValue(pokemon.stats.specialDefense, statCache.cache.specialDefense.min, statCache.cache.specialDefense.max)
+            : undefined,
+        speed: pokemon.stats.speed
+            ? _normalizeValue(pokemon.stats.speed, statCache.cache.speed.min, statCache.cache.speed.max)
+            : undefined,
     };
 }
 function _normalizeValue(value, min, max) {

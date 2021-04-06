@@ -5,7 +5,7 @@ import util from 'util';
 import {
   GroupNamedAPIResourceResponse,
   PokeApiPokemonResponse,
-} from '../models/shared';
+} from '../models/isomphic';
 
 const writeFile = util.promisify(fs.writeFile);
 

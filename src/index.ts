@@ -5,7 +5,7 @@ import generationService from './services/generation.service';
 import pokemonService from './services/pokemon.service';
 import statsService from './services/stats.service';
 import cors from 'cors';
-import { IPokemon } from './models/shared';
+import { IPokemon } from './models/isomphic';
 
 const app = express();
 app.use(cors());

@@ -5,7 +5,7 @@ import util from 'util';
 import {
   GenerationResponse,
   GroupNamedAPIResourceResponse,
-} from '../models/shared';
+} from '../models/isomphic';
 
 const writeFile = util.promisify(fs.writeFile);
 

@@ -4,7 +4,7 @@ import {
   PokemonListOptions,
   PokemonListResponse,
   SortParam,
-} from '../models/shared';
+} from '../models/isomphic';
 import pokemonService from '../services/pokemon.service';
 
 interface UnTypedQuery {

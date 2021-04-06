@@ -1,4 +1,4 @@
-import { AllPokemonStats } from '../models/shared';
+import { AllPokemonStats } from '../models/isomphic';
 import statsService from '../services/stats.service';
 
 async function getAllStats(): Promise<AllPokemonStats> {

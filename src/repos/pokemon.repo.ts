@@ -1,4 +1,4 @@
-import { PokemonJsonFormat } from '../models/shared';
+import { PokemonJsonFormat } from '../models/isomphic';
 
 import fs from 'fs';
 import util from 'util';

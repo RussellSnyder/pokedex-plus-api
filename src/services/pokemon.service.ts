@@ -7,7 +7,7 @@ import {
   SortParam,
   PokemonJsonFormat,
   IPokemon,
-} from '../models/shared';
+} from '../models/isomphic';
 import pokemonRepo from '../repos/pokemon.repo';
 import generationService from './generation.service';
 import statsService from './stats.service';
@@ -198,7 +198,8 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
   if (speed != undefined) {
     const [min, max] = speed;
     processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.speed && min <= stats.speed && stats.speed <= max,
+      ({ stats }: IPokemon) =>
+        stats.speed && min <= stats.speed && stats.speed <= max,
     );
   }
 

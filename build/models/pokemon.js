@@ -39,7 +39,10 @@ var PokemonModel = /** @class */ (function () {
         this.sprites = this._filterNullsFromSprites(data.sprites);
         var stats = data.stats.map(function (_a) {
             var stat = _a.stat, base_stat = _a.base_stat;
-            return ({ name: lodash_camelcase_1.default(stat.name), value: base_stat });
+            return ({
+                name: lodash_camelcase_1.default(stat.name),
+                value: base_stat,
+            });
         });
         stats.forEach(function (_a) {
             var name = _a.name, value = _a.value;

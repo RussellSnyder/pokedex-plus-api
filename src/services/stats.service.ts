@@ -9,7 +9,7 @@ import {
   NameAndCount,
   PokemonPhysicalCharactersitics,
   PokemonStats,
-} from '../models/shared';
+} from '../models/isomphic';
 import pokemonService from '../services/pokemon.service';
 
 const statCache: ServiceCache<AllPokemonStats> = {

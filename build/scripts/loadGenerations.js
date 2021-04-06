@@ -69,31 +69,34 @@ function _getAllGenerationNamedApiResources() {
     });
 }
 var createGenerationJson = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var res, urls, fetchedGenerations, fetchCount, _i, _a, url, res_1, generation, e_2, generationData, generationCount, e_3;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var res, urls, fetchedGenerations, fetchCount, _i, urls_1, url, res_1, generation, e_2, generationData, generationCount, e_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0: return [4 /*yield*/, _getAllGenerationNamedApiResources()];
             case 1:
-                res = _b.sent();
+                res = _a.sent();
                 urls = res === null || res === void 0 ? void 0 : res.data.results.map(function (d) { return d.url; });
+                if (!urls) {
+                    return [2 /*return*/];
+                }
                 fetchedGenerations = {};
                 fetchCount = 0;
-                _i = 0, _a = urls;
-                _b.label = 2;
+                _i = 0, urls_1 = urls;
+                _a.label = 2;
             case 2:
-                if (!(_i < _a.length)) return [3 /*break*/, 8];
-                url = _a[_i];
-                _b.label = 3;
+                if (!(_i < urls_1.length)) return [3 /*break*/, 8];
+                url = urls_1[_i];
+                _a.label = 3;
             case 3:
-                _b.trys.push([3, 5, 6, 7]);
+                _a.trys.push([3, 5, 6, 7]);
                 return [4 /*yield*/, axios_1.default.get(url)];
             case 4:
-                res_1 = _b.sent();
+                res_1 = _a.sent();
                 generation = res_1.data;
                 fetchedGenerations[generation.id] = generation;
                 return [3 /*break*/, 7];
             case 5:
-                e_2 = _b.sent();
+                e_2 = _a.sent();
                 console.log(e_2);
                 return [3 /*break*/, 7];
             case 6:
@@ -109,17 +112,17 @@ var createGenerationJson = function () { return __awaiter(void 0, void 0, void 0
                     lastUpdated: Date.now(),
                     generations: fetchedGenerations,
                 }, null, 2);
-                _b.label = 9;
+                _a.label = 9;
             case 9:
-                _b.trys.push([9, 11, , 12]);
+                _a.trys.push([9, 11, , 12]);
                 return [4 /*yield*/, writeFile('./src/data/generations.json', generationData)];
             case 10:
-                _b.sent();
+                _a.sent();
                 generationCount = Object.keys(fetchedGenerations).length;
                 console.log(generationCount + " generations saved to file");
                 return [3 /*break*/, 12];
             case 11:
-                e_3 = _b.sent();
+                e_3 = _a.sent();
                 console.log(e_3);
                 return [3 /*break*/, 12];
             case 12: return [2 /*return*/];

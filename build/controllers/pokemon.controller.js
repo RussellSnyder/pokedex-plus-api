@@ -90,59 +90,56 @@ function _parseQueryParams(_a) {
         options.filter = {};
         var splitOptions = filter.toString().split(' ');
         splitOptions.forEach(function (o) {
-            var _a;
-            var _b = o.split(':'), key = _b[0], value = _b[1];
-            if (key === 'type') {
-                options.filter.type = value;
+            var _a = o.split(':'), key = _a[0], value = _a[1];
+            if (!options.filter) {
+                return;
             }
-            if (key === 'generations') {
-                var explode = (_a = value.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);
-                var clean = explode === null || explode === void 0 ? void 0 : explode.filter(Number);
-                options.filter.generations = clean;
-            }
-            if (key === 'height') {
-                options.filter.height = _createRange(value);
-            }
-            if (key === 'weight') {
-                options.filter.weight = _createRange(value);
-            }
-            if (key === 'hp') {
-                options.filter.hp = _createRange(value);
-            }
-            if (key === 'attack') {
-                options.filter.attack = _createRange(value);
-            }
-            if (key === 'defense') {
-                options.filter.defense = _createRange(value);
-            }
-            if (key === 'specialAttack') {
-                options.filter.specialAttack = _createRange(value);
-            }
-            if (key === 'specialDefense') {
-                options.filter.specialDefense = _createRange(value);
-            }
-            if (key === 'speed') {
-                options.filter.speed = _createRange(value);
-            }
-            if (key === 'ability') {
-                options.filter.ability = value;
-            }
-            if (key === 'move') {
-                options.filter.move = value;
-            }
-            if (key === 'isDefault' || key === 'isdefault') {
-                var bool = void 0;
-                var maybeNumber = parseInt(value);
-                if (isNaN(maybeNumber)) {
-                    bool = value === 'true' ? true : false;
-                }
-                else {
-                    bool = maybeNumber === 0 ? false : true;
-                }
-                options.filter.isDefault = bool;
-            }
-            if (key === 'presentInGame') {
-                options.filter.presentInGame = value;
+            switch (key) {
+                case 'type':
+                    options.filter.type = value;
+                    break;
+                case 'generations':
+                    options.filter.generations = _parseGenerationString(value);
+                    break;
+                case 'height':
+                    options.filter.height = _createRange(value);
+                    break;
+                case 'weight':
+                    options.filter.weight = _createRange(value);
+                    break;
+                case 'hp':
+                    options.filter.hp = _createRange(value);
+                    break;
+                case 'attack':
+                    options.filter.attack = _createRange(value);
+                    break;
+                case 'defense':
+                    options.filter.defense = _createRange(value);
+                    break;
+                case 'specialAttack':
+                    options.filter.specialAttack = _createRange(value);
+                    break;
+                case 'specialDefense':
+                    options.filter.specialDefense = _createRange(value);
+                    break;
+                case 'speed':
+                    options.filter.speed = _createRange(value);
+                    break;
+                case 'ability':
+                    options.filter.ability = value;
+                    break;
+                case 'move':
+                    options.filter.move = value;
+                    break;
+                case 'isDefault':
+                    options.filter.isDefault = _parseStringBool(value);
+                    break;
+                case 'isdefault':
+                    options.filter.isDefault = _parseStringBool(value);
+                    break;
+                case 'presentInGame':
+                    options.filter.presentInGame = value;
+                    break;
             }
         });
     }
@@ -157,6 +154,25 @@ function _parseQueryParams(_a) {
     }
     return options;
 }
+var _parseGenerationString = function (value) {
+    var _a;
+    var explode = (_a = value.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);
+    if (explode) {
+        return explode.filter(Number);
+    }
+    return;
+};
+var _parseStringBool = function (value) {
+    var bool;
+    var maybeNumber = parseInt(value);
+    if (isNaN(maybeNumber)) {
+        bool = value === 'true' ? true : false;
+    }
+    else {
+        bool = maybeNumber === 0 ? false : true;
+    }
+    return bool;
+};
 var _createRange = function (lowHigh) {
     var _a;
     var result = (_a = lowHigh.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);

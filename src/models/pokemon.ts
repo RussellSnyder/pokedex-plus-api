@@ -11,7 +11,7 @@ import {
   PokemonActions,
   PokemonPhysicalCharactersitics,
   PokemonConstructorArguments,
-} from './shared';
+} from './isomphic';
 
 import camelCase from 'lodash.camelcase';
 
