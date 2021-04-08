@@ -2,10 +2,7 @@
 import axios from 'axios';
 import fs from 'fs';
 import util from 'util';
-import {
-  GenerationResponse,
-  GroupNamedAPIResourceResponse,
-} from '../models/isomphic';
+import { GenerationResponse, GroupNamedAPIResourceResponse } from '../isomorphic/types';
 
 const writeFile = util.promisify(fs.writeFile);
 

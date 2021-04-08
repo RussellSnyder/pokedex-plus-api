@@ -58,7 +58,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var pokemon_1 = require("../models/pokemon");
-var shared_1 = require("../models/shared");
+var types_1 = require("../isomorphic/types");
 var pokemon_repo_1 = __importDefault(require("../repos/pokemon.repo"));
 var generation_service_1 = __importDefault(require("./generation.service"));
 var stats_service_1 = __importDefault(require("./stats.service"));
@@ -118,7 +118,7 @@ function addNormalizedData() {
 }
 function getAllPokemon(options) {
     return __awaiter(this, void 0, void 0, function () {
-        var pokemonCache, pokemon_2, filter, sort, offset, limit, filteredCache, sortedCache, prePaginationLength, pagedCache, pokemon;
+        var pokemonCache, pokemon_2, filter, sort, interval, filteredCache, sortedCache, prePaginationLength, pagedCache, pokemon;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, _getPokemonCache()];
@@ -131,23 +131,23 @@ function getAllPokemon(options) {
                                 totalResults: pokemon_2.length,
                             }];
                     }
-                    filter = options.filter, sort = options.sort, offset = options.offset, limit = options.limit;
+                    filter = options.filter, sort = options.sort, interval = options.interval;
                     filteredCache = _filterPokemonList(pokemonCache, filter);
                     sortedCache = _sortPokemonList(filteredCache, sort);
                     prePaginationLength = Object.keys(sortedCache).length;
-                    if (limit != undefined && limit > prePaginationLength) {
+                    if ((interval === null || interval === void 0 ? void 0 : interval.limit) != undefined && (interval === null || interval === void 0 ? void 0 : interval.limit) > prePaginationLength) {
                         return [2 /*return*/, {
                                 results: Object.values(sortedCache),
                                 totalResults: prePaginationLength,
                             }];
                     }
-                    pagedCache = _pagePokemonList(sortedCache, limit, offset);
+                    pagedCache = _pagePokemonList(sortedCache, interval === null || interval === void 0 ? void 0 : interval.limit, interval === null || interval === void 0 ? void 0 : interval.offset);
                     pokemon = Object.values(pagedCache);
                     return [2 /*return*/, {
                             results: Object.values(pokemon),
                             totalResults: Object.values(sortedCache).length,
-                            offset: offset,
-                            limit: limit,
+                            offset: interval === null || interval === void 0 ? void 0 : interval.offset,
+                            limit: interval === null || interval === void 0 ? void 0 : interval.limit,
                         }];
             }
         });
@@ -200,51 +200,52 @@ function _pagePokemonList(pokemonCache, limit, offset) {
     }, {});
 }
 function _filterPokemonList(pokemonCache, filter) {
+    console.log({ filter: filter });
     if (!filter) {
         return pokemonCache;
     }
     var processedPokemon = __spreadArrays(Object.values(pokemonCache));
-    var type = filter.type, generations = filter.generations, height = filter.height, weight = filter.weight, hp = filter.hp, attack = filter.attack, defense = filter.defense, specialAttack = filter.specialAttack, specialDefense = filter.specialDefense, speed = filter.speed, ability = filter.ability, move = filter.move, isDefault = filter.isDefault, presentInGame = filter.presentInGame;
-    if (type != undefined) {
+    var typeList = filter.typeList, generationList = filter.generationList, heightRange = filter.heightRange, weightRange = filter.weightRange, hpRange = filter.hpRange, attackRange = filter.attackRange, defenseRange = filter.defenseRange, specialAttackRange = filter.specialAttackRange, specialDefenseRange = filter.specialDefenseRange, speedRange = filter.speedRange, abilityList = filter.abilityList, moveList = filter.moveList, isDefault = filter.isDefault, presentInGameList = filter.presentInGameList;
+    if (typeList != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) {
-            return pokemon.types.includes(type);
+            return typeList.every(function (type) { return pokemon.types.includes(type); });
         });
     }
-    if (generations != undefined) {
+    if (generationList != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) {
-            return generations.includes(pokemon.generation);
+            return generationList.includes(pokemon.generation);
         });
     }
-    if (hp != undefined) {
-        var min_1 = hp[0], max_1 = hp[1];
+    if (hpRange != undefined) {
+        var min_1 = hpRange[0], max_1 = hpRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var stats = _a.stats;
             return stats.hp && min_1 <= stats.hp && stats.hp <= max_1;
         });
     }
-    if (speed != undefined) {
-        var min_2 = speed[0], max_2 = speed[1];
+    if (speedRange != undefined) {
+        var min_2 = speedRange[0], max_2 = speedRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var stats = _a.stats;
             return stats.speed && min_2 <= stats.speed && stats.speed <= max_2;
         });
     }
-    if (attack != undefined) {
-        var min_3 = attack[0], max_3 = attack[1];
+    if (attackRange != undefined) {
+        var min_3 = attackRange[0], max_3 = attackRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var stats = _a.stats;
             return stats.attack && min_3 <= stats.attack && stats.attack <= max_3;
         });
     }
-    if (defense != undefined) {
-        var min_4 = defense[0], max_4 = defense[1];
+    if (defenseRange != undefined) {
+        var min_4 = defenseRange[0], max_4 = defenseRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var stats = _a.stats;
             return stats.defense && min_4 <= stats.defense && stats.defense <= max_4;
         });
     }
-    if (specialAttack != undefined) {
-        var min_5 = specialAttack[0], max_5 = specialAttack[1];
+    if (specialAttackRange != undefined) {
+        var min_5 = specialAttackRange[0], max_5 = specialAttackRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var stats = _a.stats;
             return stats.specialAttack &&
@@ -252,8 +253,8 @@ function _filterPokemonList(pokemonCache, filter) {
                 stats.specialAttack <= max_5;
         });
     }
-    if (specialDefense != undefined) {
-        var min_6 = specialDefense[0], max_6 = specialDefense[1];
+    if (specialDefenseRange != undefined) {
+        var min_6 = specialDefenseRange[0], max_6 = specialDefenseRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var stats = _a.stats;
             return stats.specialDefense &&
@@ -261,36 +262,36 @@ function _filterPokemonList(pokemonCache, filter) {
                 stats.specialDefense <= max_6;
         });
     }
-    if (height != undefined) {
-        var min_7 = height[0], max_7 = height[1];
+    if (heightRange != undefined) {
+        var min_7 = heightRange[0], max_7 = heightRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var height = _a.height;
             return min_7 <= height && height <= max_7;
         });
     }
-    if (weight != undefined) {
-        var min_8 = weight[0], max_8 = weight[1];
+    if (weightRange != undefined) {
+        var min_8 = weightRange[0], max_8 = weightRange[1];
         processedPokemon = processedPokemon.filter(function (_a) {
             var weight = _a.weight;
             return min_8 <= weight && weight <= max_8;
         });
     }
-    if (ability != undefined) {
+    if (abilityList != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) {
-            return pokemon.actions.abilities.includes(ability);
+            return abilityList.every(function (ability) { return pokemon.actions.abilities.includes(ability); });
         });
     }
-    if (move != undefined) {
+    if (moveList != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) {
-            return pokemon.actions.moves.includes(move);
+            return moveList.every(function (move) { return pokemon.actions.moves.includes(move); });
         });
     }
     if (isDefault != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) { return pokemon.isDefault === isDefault; });
     }
-    if (presentInGame != undefined) {
+    if (presentInGameList != undefined) {
         processedPokemon = processedPokemon.filter(function (pokemon) {
-            return pokemon.gamesWherePresent.includes(presentInGame);
+            return presentInGameList.every(function (presentInGame) { return pokemon.gamesWherePresent.includes(presentInGame); });
         });
     }
     return Object.entries(processedPokemon).reduce(function (r, _a) {
@@ -305,13 +306,13 @@ function _sortPokemonList(pokemonCache, sort) {
     }
     var processedPokemon = __spreadArrays(Object.values(pokemonCache));
     switch (sort) {
-        case shared_1.SortParam.NameAsc:
+        case types_1.SortParam.NameAsc:
             processedPokemon.sort(function (a, b) { return a.name - b.name; });
             break;
-        case shared_1.SortParam.NameDesc:
+        case types_1.SortParam.NameDesc:
             processedPokemon.sort(function (a, b) { return b.name - a.name; });
             break;
-        case shared_1.SortParam.HeightDesc:
+        case types_1.SortParam.HeightDesc:
             processedPokemon.sort(function (a, b) { return a.height - b.height; });
             break;
         case 'height-desc':

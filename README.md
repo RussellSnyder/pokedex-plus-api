@@ -11,7 +11,7 @@
 
 example query param
 ```
-pokemon?limit=20&offset=20&filter=defense:100,150+attack:,150
+http://localhost:3000/api/v1/pokemon?i-limit=30&f-types-l=fire,water&f-generation-l=4,6,5&f-hp-r=,300&f-isdefault-b=true
 ```
 ### Scripts
 

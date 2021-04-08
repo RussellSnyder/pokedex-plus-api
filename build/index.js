@@ -57,7 +57,7 @@ function setupRoutes() {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, pokemon_controller_1.default.getPokemonList(req.query)];
+                    return [4 /*yield*/, pokemon_controller_1.default.getPokemonList(req)];
                 case 1:
                     pokemon = _b.sent();
                     res.send(JSON.stringify(pokemon, null, 2));

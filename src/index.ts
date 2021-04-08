@@ -5,7 +5,7 @@ import generationService from './services/generation.service';
 import pokemonService from './services/pokemon.service';
 import statsService from './services/stats.service';
 import cors from 'cors';
-import { IPokemon } from './models/isomphic';
+import { IPokemon } from './isomorphic/types';
 
 const app = express();
 app.use(cors());
@@ -15,7 +15,7 @@ const port = 3000;
 function setupRoutes(): void {
   app.get('/api/v1/pokemon', async (req: Request, res: Response) => {
     try {
-      const pokemon = await pokemonController.getPokemonList(req.query);
+      const pokemon = await pokemonController.getPokemonList(req);
       res.send(JSON.stringify(pokemon, null, 2));
     } catch {
       res.sendStatus(500);

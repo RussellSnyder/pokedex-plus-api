@@ -7,7 +7,7 @@ import {
   SortParam,
   PokemonJsonFormat,
   IPokemon,
-} from '../models/isomphic';
+} from '../isomorphic/types';
 import pokemonRepo from '../repos/pokemon.repo';
 import generationService from './generation.service';
 import statsService from './stats.service';
@@ -90,28 +90,28 @@ async function getAllPokemon(
     };
   }
 
-  const { filter, sort, offset, limit } = options;
+  const { filter, sort, interval } = options;
 
   const filteredCache = _filterPokemonList(pokemonCache, filter);
   const sortedCache = _sortPokemonList(filteredCache, sort);
-
+  
   const prePaginationLength = Object.keys(sortedCache).length;
-
-  if (limit != undefined && limit > prePaginationLength) {
+  
+  if (interval?.limit != undefined && interval?.limit > prePaginationLength) {
     return {
       results: Object.values(sortedCache),
       totalResults: prePaginationLength,
     };
   }
-  const pagedCache = _pagePokemonList(sortedCache, limit, offset);
+  const pagedCache = _pagePokemonList(sortedCache, interval?.limit, interval?.offset);
 
   const pokemon = Object.values(pagedCache);
 
   return {
     results: Object.values(pokemon),
     totalResults: Object.values(sortedCache).length,
-    offset,
-    limit,
+    offset: interval?.offset,
+    limit: interval?.limit,
   };
 }
 
@@ -153,6 +153,7 @@ function _pagePokemonList(
 }
 
 function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
+  console.log({filter});
   if (!filter) {
     return pokemonCache;
   }
@@ -160,67 +161,67 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
   let processedPokemon = [...Object.values(pokemonCache)];
 
   const {
-    type,
-    generations,
-    height,
-    weight,
-    hp,
-    attack,
-    defense,
-    specialAttack,
-    specialDefense,
-    speed,
-    ability,
-    move,
+    typeList,
+    generationList,
+    heightRange,
+    weightRange,
+    hpRange,
+    attackRange,
+    defenseRange,
+    specialAttackRange,
+    specialDefenseRange,
+    speedRange,
+    abilityList,
+    moveList,
     isDefault,
-    presentInGame,
+    presentInGameList,
   } = filter;
 
-  if (type != undefined) {
+  if (typeList != undefined) {
     processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
-      pokemon.types.includes(type),
+    typeList.every(type => pokemon.types.includes(type)),
     );
   }
 
-  if (generations != undefined) {
+  if (generationList != undefined) {
     processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
-      generations.includes(pokemon.generation),
+      generationList.includes(pokemon.generation),
     );
   }
 
-  if (hp != undefined) {
-    const [min, max] = hp;
+  if (hpRange != undefined) {
+    const [min, max] = hpRange;
     processedPokemon = processedPokemon.filter(
       ({ stats }: IPokemon) => stats.hp && min <= stats.hp && stats.hp <= max,
     );
   }
 
-  if (speed != undefined) {
-    const [min, max] = speed;
+  if (speedRange != undefined) {
+    const [min, max] = speedRange;
     processedPokemon = processedPokemon.filter(
       ({ stats }: IPokemon) =>
         stats.speed && min <= stats.speed && stats.speed <= max,
     );
   }
 
-  if (attack != undefined) {
-    const [min, max] = attack;
+  if (attackRange != undefined) {
+    const [min, max] = attackRange;
     processedPokemon = processedPokemon.filter(
       ({ stats }: IPokemon) =>
         stats.attack && min <= stats.attack && stats.attack <= max,
     );
   }
 
-  if (defense != undefined) {
-    const [min, max] = defense;
+  if (defenseRange != undefined) {
+    const [min, max] = defenseRange;
     processedPokemon = processedPokemon.filter(
       ({ stats }: IPokemon) =>
         stats.defense && min <= stats.defense && stats.defense <= max,
     );
   }
 
-  if (specialAttack != undefined) {
-    const [min, max] = specialAttack;
+  if (specialAttackRange != undefined) {
+    const [min, max] = specialAttackRange;
     processedPokemon = processedPokemon.filter(
       ({ stats }: IPokemon) =>
         stats.specialAttack &&
@@ -229,8 +230,8 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
     );
   }
 
-  if (specialDefense != undefined) {
-    const [min, max] = specialDefense;
+  if (specialDefenseRange != undefined) {
+    const [min, max] = specialDefenseRange;
     processedPokemon = processedPokemon.filter(
       ({ stats }: IPokemon) =>
         stats.specialDefense &&
@@ -239,29 +240,29 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
     );
   }
 
-  if (height != undefined) {
-    const [min, max] = height;
+  if (heightRange != undefined) {
+    const [min, max] = heightRange;
     processedPokemon = processedPokemon.filter(
       ({ height }) => min <= height && height <= max,
     );
   }
 
-  if (weight != undefined) {
-    const [min, max] = weight;
+  if (weightRange != undefined) {
+    const [min, max] = weightRange;
     processedPokemon = processedPokemon.filter(
       ({ weight }) => min <= weight && weight <= max,
     );
   }
 
-  if (ability != undefined) {
+  if (abilityList != undefined) {
     processedPokemon = processedPokemon.filter((pokemon: PokemonModel) =>
-      pokemon.actions.abilities.includes(ability),
+      abilityList.every(ability => pokemon.actions.abilities.includes(ability)),
     );
   }
 
-  if (move != undefined) {
+  if (moveList != undefined) {
     processedPokemon = processedPokemon.filter((pokemon: PokemonModel) =>
-      pokemon.actions.moves.includes(move),
+      moveList.every(move => pokemon.actions.moves.includes(move)),
     );
   }
 
@@ -271,9 +272,9 @@ function _filterPokemonList(pokemonCache: PokemonCache, filter?: FilterParam) {
     );
   }
 
-  if (presentInGame != undefined) {
+  if (presentInGameList != undefined) {
     processedPokemon = processedPokemon.filter((pokemon: PokemonModel) =>
-      pokemon.gamesWherePresent.includes(presentInGame),
+    presentInGameList.every(presentInGame => pokemon.gamesWherePresent.includes(presentInGame)),
     );
   }
 

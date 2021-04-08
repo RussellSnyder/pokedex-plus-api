@@ -1,4 +1,4 @@
-import { PokemonSprite } from '../models/isomphic';
+import { PokemonSprite } from '../isomorphic/types';
 
 export function cleanSprite(
   pokemonSprite: PokemonSprite,

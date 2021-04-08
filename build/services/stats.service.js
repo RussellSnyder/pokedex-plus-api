@@ -72,6 +72,7 @@ function createStatCache() {
                         types: _calculateNameAndCount(lodash_flattendeep_1.default(pokemon.map(function (p) { return p.types; }))),
                         abilities: _calculateNameAndCount(lodash_flattendeep_1.default(pokemon.map(function (p) { return p.actions.abilities; }))),
                         moves: _calculateNameAndCount(lodash_flattendeep_1.default(pokemon.map(function (p) { return p.actions.moves; }))),
+                        generations: Array.from(new Set(pokemon.map(function (p) { return p.generation; }))),
                         pokemonInGeneration: _calculateNameAndCount(pokemon.map(function (p) { return p.generation; })),
                         pokemonPresentInGame: _calculateNameAndCount(lodash_flattendeep_1.default(pokemon.map(function (p) { return p.gamesWherePresent; }))),
                         weight: _calculateAllPokemonStat(pokemon.map(function (p) { return p.physicalCharacteristics.weight; })),

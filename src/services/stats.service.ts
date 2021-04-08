@@ -5,11 +5,11 @@ import {
   AllPokemonStat,
   AllPokemonStats,
   IPokemon,
-  MathmaticalStats,
+  MathematicalStats,
   NameAndCount,
-  PokemonPhysicalCharactersitics,
+  PokemonPhysicalCharacteristics,
   PokemonStats,
-} from '../models/isomphic';
+} from '../isomorphic/types';
 import pokemonService from '../services/pokemon.service';
 
 const statCache: ServiceCache<AllPokemonStats> = {
@@ -21,7 +21,7 @@ async function createStatCache(): Promise<void> {
   statCache.isCacheLoaded = false;
 
   const pokemonList = await pokemonService.getAllPokemon();
-  const pokemon = pokemonList.results;
+  const pokemon = pokemonList.results as IPokemon[];
 
   statCache.cache = {
     types: _calculateNameAndCount(flattenDeep(pokemon.map(p => p.types))),
@@ -31,6 +31,7 @@ async function createStatCache(): Promise<void> {
     moves: _calculateNameAndCount(
       flattenDeep(pokemon.map(p => p.actions.moves)),
     ),
+    generations: Array.from(new Set(pokemon.map(p => p.generation))),
     pokemonInGeneration: _calculateNameAndCount(pokemon.map(p => p.generation)),
     pokemonPresentInGame: _calculateNameAndCount(
       flattenDeep(pokemon.map(p => p.gamesWherePresent)),
@@ -82,7 +83,7 @@ async function getAllStats(): Promise<AllPokemonStats> {
 
 function calculateNormalizedPhysicalCharacteristics(
   pokemon: IPokemon,
-): PokemonPhysicalCharactersitics {
+): PokemonPhysicalCharacteristics {
   return {
     height: _normalizeValue(
       pokemon.physicalCharacteristics.height,
@@ -168,7 +169,7 @@ function _calculateAllPokemonStat(values: number[]): AllPokemonStat {
   };
 }
 
-function _calculateMathmaticalStats(values: number[]): MathmaticalStats {
+function _calculateMathmaticalStats(values: number[]): MathematicalStats {
   const sorted = values.sort((a, b) => a - b);
 
   return {

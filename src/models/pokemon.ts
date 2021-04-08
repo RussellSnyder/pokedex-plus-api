@@ -9,9 +9,9 @@ import {
   VersionPokemonSprite,
   PokemonStats,
   PokemonActions,
-  PokemonPhysicalCharactersitics,
+  PokemonPhysicalCharacteristics,
   PokemonConstructorArguments,
-} from './isomphic';
+} from '../isomorphic/types';
 
 import camelCase from 'lodash.camelcase';
 
@@ -31,8 +31,8 @@ export class PokemonModel implements IPokemon {
   isDefault: boolean;
   actions: PokemonActions;
 
-  physicalCharacteristics: PokemonPhysicalCharactersitics;
-  normalizedPhysicalCharacteristics!: PokemonPhysicalCharactersitics;
+  physicalCharacteristics: PokemonPhysicalCharacteristics;
+  normalizedPhysicalCharacteristics!: PokemonPhysicalCharacteristics;
 
   sprites: PokemonSpriteSet;
   stats: PokemonStats = {};

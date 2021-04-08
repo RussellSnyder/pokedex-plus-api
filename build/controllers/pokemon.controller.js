@@ -39,14 +39,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var util_1 = __importDefault(require("util"));
+var url_functions_1 = require("../isomorphic/url-functions");
 var pokemon_service_1 = __importDefault(require("../services/pokemon.service"));
-function getPokemonList(queryParams) {
+function getPokemonList(req) {
     return __awaiter(this, void 0, void 0, function () {
         var options, pokemon, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    options = queryParams ? _parseQueryParams(queryParams) : undefined;
+                    options = req.query ? url_functions_1.decodePokemonListQueryParams(req.query) : undefined;
+                    console.log('parsed', util_1.default.inspect(options, true, 100));
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
@@ -83,115 +86,6 @@ function getPokemonByName(name) {
         });
     });
 }
-function _parseQueryParams(_a) {
-    var filter = _a.filter, sort = _a.sort, offset = _a.offset, limit = _a.limit;
-    var options = {};
-    if (filter) {
-        options.filter = {};
-        var splitOptions = filter.toString().split(' ');
-        splitOptions.forEach(function (o) {
-            var _a = o.split(':'), key = _a[0], value = _a[1];
-            if (!options.filter) {
-                return;
-            }
-            switch (key) {
-                case 'type':
-                    options.filter.type = value;
-                    break;
-                case 'generations':
-                    options.filter.generations = _parseGenerationString(value);
-                    break;
-                case 'height':
-                    options.filter.height = _createRange(value);
-                    break;
-                case 'weight':
-                    options.filter.weight = _createRange(value);
-                    break;
-                case 'hp':
-                    options.filter.hp = _createRange(value);
-                    break;
-                case 'attack':
-                    options.filter.attack = _createRange(value);
-                    break;
-                case 'defense':
-                    options.filter.defense = _createRange(value);
-                    break;
-                case 'specialAttack':
-                    options.filter.specialAttack = _createRange(value);
-                    break;
-                case 'specialDefense':
-                    options.filter.specialDefense = _createRange(value);
-                    break;
-                case 'speed':
-                    options.filter.speed = _createRange(value);
-                    break;
-                case 'ability':
-                    options.filter.ability = value;
-                    break;
-                case 'move':
-                    options.filter.move = value;
-                    break;
-                case 'isDefault':
-                    options.filter.isDefault = _parseStringBool(value);
-                    break;
-                case 'isdefault':
-                    options.filter.isDefault = _parseStringBool(value);
-                    break;
-                case 'presentInGame':
-                    options.filter.presentInGame = value;
-                    break;
-            }
-        });
-    }
-    if (sort) {
-        options.sort = sort;
-    }
-    if (offset) {
-        options.offset = parseInt(offset);
-    }
-    if (limit) {
-        options.limit = parseInt(limit);
-    }
-    return options;
-}
-var _parseGenerationString = function (value) {
-    var _a;
-    var explode = (_a = value.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);
-    if (explode) {
-        return explode.filter(Number);
-    }
-    return;
-};
-var _parseStringBool = function (value) {
-    var bool;
-    var maybeNumber = parseInt(value);
-    if (isNaN(maybeNumber)) {
-        bool = value === 'true' ? true : false;
-    }
-    else {
-        bool = maybeNumber === 0 ? false : true;
-    }
-    return bool;
-};
-var _createRange = function (lowHigh) {
-    var _a;
-    var result = (_a = lowHigh.match(/\d+|,/g)) === null || _a === void 0 ? void 0 : _a.map(Number);
-    var min = -Infinity;
-    var max = Infinity;
-    // a comma first means min is -Infinity;
-    if ((result === null || result === void 0 ? void 0 : result.length) === 3) {
-        min = result[0];
-        max = result[2];
-    }
-    else if (isNaN(parseInt(result[0], 10))) {
-        // starts with comma, so we set the max
-        max = result[1];
-    }
-    else {
-        min = result[0];
-    }
-    return [min, max];
-};
 exports.default = {
     getPokemonByName: getPokemonByName,
     getPokemonList: getPokemonList,

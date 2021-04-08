@@ -1,5 +1,5 @@
 import { ServiceCache } from '../models/backend';
-import { GenerationResponse } from '../models/isomphic';
+import { GenerationResponse } from '../isomorphic/types';
 import generationRepo from '../repos/generation.repo';
 
 export interface GenerationCache {

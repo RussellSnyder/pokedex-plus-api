@@ -1,7 +1,6 @@
-import { PokemonJsonFormat } from '../models/isomphic';
-
 import fs from 'fs';
 import util from 'util';
+import { PokemonJsonFormat } from '../isomorphic/types';
 const readfile = util.promisify(fs.readFile);
 
 async function getAllPokemon(): Promise<PokemonJsonFormat[]> {
