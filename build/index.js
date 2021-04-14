@@ -51,27 +51,9 @@ app.use(cors_1.default());
 var port = 3000;
 function setupRoutes() {
     var _this = this;
-    app.get('/api/v1/pokemon', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-        var pokemon, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _b.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, pokemon_controller_1.default.getPokemonList(req)];
-                case 1:
-                    pokemon = _b.sent();
-                    res.send(JSON.stringify(pokemon, null, 2));
-                    return [3 /*break*/, 3];
-                case 2:
-                    _a = _b.sent();
-                    res.sendStatus(500);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); });
+    app.get('/api/v1/pokemon', pokemon_controller_1.default.getAllPokemon);
     app.get('/api/v1/pokemon/:id', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-        var idOrName, pokemon, name, id;
+        var idOrName, pokemon, name, id, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -79,21 +61,33 @@ function setupRoutes() {
                     if (!idOrName) {
                         res.sendStatus(404);
                     }
-                    if (!isNaN(idOrName)) return [3 /*break*/, 2];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 6, , 7]);
+                    if (!isNaN(idOrName)) return [3 /*break*/, 3];
                     name = idOrName;
                     return [4 /*yield*/, pokemon_controller_1.default.getPokemonByName(name)];
-                case 1:
-                    pokemon = _a.sent();
-                    return [3 /*break*/, 4];
                 case 2:
+                    pokemon = _a.sent();
+                    return [3 /*break*/, 5];
+                case 3:
                     id = idOrName;
                     return [4 /*yield*/, pokemon_controller_1.default.getPokemonById(id)];
-                case 3:
-                    pokemon = _a.sent();
-                    _a.label = 4;
                 case 4:
+                    pokemon = _a.sent();
+                    _a.label = 5;
+                case 5:
+                    if (!pokemon) {
+                        res.sendStatus(404);
+                        return [2 /*return*/];
+                    }
                     res.send(JSON.stringify(pokemon));
-                    return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 6:
+                    e_1 = _a.sent();
+                    console.warn(e_1);
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     }); });

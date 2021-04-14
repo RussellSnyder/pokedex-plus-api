@@ -1,4 +1,4 @@
-import { AllPokemonStats } from '../isomorphic/types';
+import { AllPokemonStats } from 'pokedex-plus-isomorphic/lib/types';
 import statsService from '../services/stats.service';
 
 async function getAllStats(): Promise<AllPokemonStats> {

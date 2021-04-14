@@ -1,11 +1,8 @@
 'use strict';
 import axios from 'axios';
 import fs from 'fs';
+import { GroupNamedAPIResourceResponse, PokeApiPokemonResponse } from 'pokedex-plus-isomorphic/lib/types';
 import util from 'util';
-import {
-  GroupNamedAPIResourceResponse,
-  PokeApiPokemonResponse,
-} from '../isomorphic/types';
 
 const writeFile = util.promisify(fs.writeFile);
 

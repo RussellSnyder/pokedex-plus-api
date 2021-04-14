@@ -1,6 +1,6 @@
 import fs from 'fs';
+import { GenerationResponse } from 'pokedex-plus-isomorphic/lib/types';
 import util from 'util';
-import { GenerationResponse } from '../isomorphic/types';
 
 const readfile = util.promisify(fs.readFile);
 

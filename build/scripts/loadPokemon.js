@@ -46,6 +46,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -100,55 +127,70 @@ function _getAllPokemonNamedApiResources(count) {
     });
 }
 var createPokemonJson = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var count, res, urls, fetchedpokemon, fetchCount, _i, urls_1, url, res_1, pokemon, e_3, trimmedData, pokemonData, pokemonCount, e_4;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var count, res, urls, fetchedpokemon, fetchCount, urls_1, urls_1_1, url, res_1, pokemon, e_3, e_4_1, trimmedData, pokemonData, pokemonCount, e_5;
+    var e_4, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0: return [4 /*yield*/, _getPokemonCount()];
             case 1:
-                count = _a.sent();
+                count = _b.sent();
                 if (!count) {
                     return [2 /*return*/];
                 }
                 return [4 /*yield*/, _getAllPokemonNamedApiResources(count)];
             case 2:
-                res = _a.sent();
+                res = _b.sent();
                 urls = res === null || res === void 0 ? void 0 : res.data.results.map(function (d) { return d.url; });
                 if (!urls) {
                     return [2 /*return*/];
                 }
                 fetchedpokemon = {};
                 fetchCount = 0;
-                _i = 0, urls_1 = urls;
-                _a.label = 3;
+                _b.label = 3;
             case 3:
-                if (!(_i < urls_1.length)) return [3 /*break*/, 9];
-                url = urls_1[_i];
-                _a.label = 4;
+                _b.trys.push([3, 11, 12, 13]);
+                urls_1 = __values(urls), urls_1_1 = urls_1.next();
+                _b.label = 4;
             case 4:
-                _a.trys.push([4, 6, 7, 8]);
-                return [4 /*yield*/, axios_1.default.get(url)];
+                if (!!urls_1_1.done) return [3 /*break*/, 10];
+                url = urls_1_1.value;
+                _b.label = 5;
             case 5:
-                res_1 = _a.sent();
+                _b.trys.push([5, 7, 8, 9]);
+                return [4 /*yield*/, axios_1.default.get(url)];
+            case 6:
+                res_1 = _b.sent();
                 pokemon = res_1.data;
                 fetchedpokemon[pokemon.id] = pokemon;
-                return [3 /*break*/, 8];
-            case 6:
-                e_3 = _a.sent();
-                console.log("failed to fetch " + url);
-                return [3 /*break*/, 8];
+                return [3 /*break*/, 9];
             case 7:
+                e_3 = _b.sent();
+                console.log("failed to fetch " + url);
+                return [3 /*break*/, 9];
+            case 8:
                 fetchCount++;
                 if (fetchCount % 10 === 0) {
                     console.log('fetched', fetchCount, 'pokemon');
                 }
                 return [7 /*endfinally*/];
-            case 8:
-                _i++;
-                return [3 /*break*/, 3];
             case 9:
+                urls_1_1 = urls_1.next();
+                return [3 /*break*/, 4];
+            case 10: return [3 /*break*/, 13];
+            case 11:
+                e_4_1 = _b.sent();
+                e_4 = { error: e_4_1 };
+                return [3 /*break*/, 13];
+            case 12:
+                try {
+                    if (urls_1_1 && !urls_1_1.done && (_a = urls_1.return)) _a.call(urls_1);
+                }
+                finally { if (e_4) throw e_4.error; }
+                return [7 /*endfinally*/];
+            case 13:
                 console.log("loaded " + Object.keys(fetchedpokemon).length + " pokemon");
                 trimmedData = Object.entries(fetchedpokemon).map(function (_a) {
-                    var _ = _a[0], p = _a[1];
+                    var _b = __read(_a, 2), _ = _b[0], p = _b[1];
                     var moves = p.moves.map(function (move) { return move.move; });
                     return __assign(__assign({}, p), { moves: moves });
                 });
@@ -156,20 +198,20 @@ var createPokemonJson = function () { return __awaiter(void 0, void 0, void 0, f
                     lastUpdated: Date.now(),
                     pokemon: trimmedData,
                 }, null, 2);
-                _a.label = 10;
-            case 10:
-                _a.trys.push([10, 12, , 13]);
+                _b.label = 14;
+            case 14:
+                _b.trys.push([14, 16, , 17]);
                 return [4 /*yield*/, writeFile('./src/data/pokemon.json', pokemonData)];
-            case 11:
-                _a.sent();
+            case 15:
+                _b.sent();
                 pokemonCount = Object.keys(fetchedpokemon).length;
                 console.log(pokemonCount + " pokemon saved to file");
-                return [3 /*break*/, 13];
-            case 12:
-                e_4 = _a.sent();
-                console.log(e_4);
-                return [3 /*break*/, 13];
-            case 13: return [2 /*return*/];
+                return [3 /*break*/, 17];
+            case 16:
+                e_5 = _b.sent();
+                console.log(e_5);
+                return [3 /*break*/, 17];
+            case 17: return [2 /*return*/];
         }
     });
 }); };

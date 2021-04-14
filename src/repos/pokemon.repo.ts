@@ -1,6 +1,6 @@
 import fs from 'fs';
+import { PokemonJsonFormat } from 'pokedex-plus-isomorphic/lib/types';
 import util from 'util';
-import { PokemonJsonFormat } from '../isomorphic/types';
 const readfile = util.promisify(fs.readFile);
 
 async function getAllPokemon(): Promise<PokemonJsonFormat[]> {

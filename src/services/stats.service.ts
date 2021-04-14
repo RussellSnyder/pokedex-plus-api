@@ -1,15 +1,7 @@
 import flattenDeep from 'lodash.flattendeep';
+import { AllPokemonStats, IPokemon, PokemonPhysicalCharacteristics, PokemonStats, AllPokemonStat, MathematicalStats, NameAndCount } from 'pokedex-plus-isomorphic/lib/types';
 import stats from 'stats-lite';
-import { ServiceCache } from '../models/backend';
-import {
-  AllPokemonStat,
-  AllPokemonStats,
-  IPokemon,
-  MathematicalStats,
-  NameAndCount,
-  PokemonPhysicalCharacteristics,
-  PokemonStats,
-} from '../isomorphic/types';
+import { ServiceCache } from '../models/service-cache';
 import pokemonService from '../services/pokemon.service';
 
 const statCache: ServiceCache<AllPokemonStats> = {
@@ -20,7 +12,7 @@ const statCache: ServiceCache<AllPokemonStats> = {
 async function createStatCache(): Promise<void> {
   statCache.isCacheLoaded = false;
 
-  const pokemonList = await pokemonService.getAllPokemon();
+  const pokemonList = await pokemonService.getPokemon();
   const pokemon = pokemonList.results as IPokemon[];
 
   statCache.cache = {
@@ -111,7 +103,7 @@ function calculateNormalizedBaseExperience(
   };
 }
 
-function calculatenormalizedStats(pokemon: IPokemon): PokemonStats {
+function calculateNormalizedStats(pokemon: IPokemon): PokemonStats {
   return {
     hp: pokemon.stats.hp
       ? _normalizeValue(
@@ -204,6 +196,6 @@ export default {
   createStatCache,
   getAllStats,
   calculateNormalizedPhysicalCharacteristics,
-  calculatenormalizedStats,
+  calculateNormalizedStats,
   calculateNormalizedBaseExperience,
 };

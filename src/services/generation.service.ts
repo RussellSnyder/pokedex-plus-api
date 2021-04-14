@@ -1,5 +1,5 @@
-import { ServiceCache } from '../models/backend';
-import { GenerationResponse } from '../isomorphic/types';
+import { GenerationResponse } from 'pokedex-plus-isomorphic/lib/types';
+import { ServiceCache } from '../models/service-cache';
 import generationRepo from '../repos/generation.repo';
 
 export interface GenerationCache {

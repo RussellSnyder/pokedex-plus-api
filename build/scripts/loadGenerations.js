@@ -35,6 +35,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -69,63 +80,78 @@ function _getAllGenerationNamedApiResources() {
     });
 }
 var createGenerationJson = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var res, urls, fetchedGenerations, fetchCount, _i, urls_1, url, res_1, generation, e_2, generationData, generationCount, e_3;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var res, urls, fetchedGenerations, fetchCount, urls_1, urls_1_1, url, res_1, generation, e_2, e_3_1, generationData, generationCount, e_4;
+    var e_3, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0: return [4 /*yield*/, _getAllGenerationNamedApiResources()];
             case 1:
-                res = _a.sent();
+                res = _b.sent();
                 urls = res === null || res === void 0 ? void 0 : res.data.results.map(function (d) { return d.url; });
                 if (!urls) {
                     return [2 /*return*/];
                 }
                 fetchedGenerations = {};
                 fetchCount = 0;
-                _i = 0, urls_1 = urls;
-                _a.label = 2;
+                _b.label = 2;
             case 2:
-                if (!(_i < urls_1.length)) return [3 /*break*/, 8];
-                url = urls_1[_i];
-                _a.label = 3;
+                _b.trys.push([2, 10, 11, 12]);
+                urls_1 = __values(urls), urls_1_1 = urls_1.next();
+                _b.label = 3;
             case 3:
-                _a.trys.push([3, 5, 6, 7]);
-                return [4 /*yield*/, axios_1.default.get(url)];
+                if (!!urls_1_1.done) return [3 /*break*/, 9];
+                url = urls_1_1.value;
+                _b.label = 4;
             case 4:
-                res_1 = _a.sent();
+                _b.trys.push([4, 6, 7, 8]);
+                return [4 /*yield*/, axios_1.default.get(url)];
+            case 5:
+                res_1 = _b.sent();
                 generation = res_1.data;
                 fetchedGenerations[generation.id] = generation;
-                return [3 /*break*/, 7];
-            case 5:
-                e_2 = _a.sent();
-                console.log(e_2);
-                return [3 /*break*/, 7];
+                return [3 /*break*/, 8];
             case 6:
+                e_2 = _b.sent();
+                console.log(e_2);
+                return [3 /*break*/, 8];
+            case 7:
                 fetchCount++;
                 console.log('fetched', fetchCount, 'generations');
                 return [7 /*endfinally*/];
-            case 7:
-                _i++;
-                return [3 /*break*/, 2];
             case 8:
+                urls_1_1 = urls_1.next();
+                return [3 /*break*/, 3];
+            case 9: return [3 /*break*/, 12];
+            case 10:
+                e_3_1 = _b.sent();
+                e_3 = { error: e_3_1 };
+                return [3 /*break*/, 12];
+            case 11:
+                try {
+                    if (urls_1_1 && !urls_1_1.done && (_a = urls_1.return)) _a.call(urls_1);
+                }
+                finally { if (e_3) throw e_3.error; }
+                return [7 /*endfinally*/];
+            case 12:
                 console.log("loaded " + Object.keys(fetchedGenerations).length + " generations");
                 generationData = JSON.stringify({
                     lastUpdated: Date.now(),
                     generations: fetchedGenerations,
                 }, null, 2);
-                _a.label = 9;
-            case 9:
-                _a.trys.push([9, 11, , 12]);
+                _b.label = 13;
+            case 13:
+                _b.trys.push([13, 15, , 16]);
                 return [4 /*yield*/, writeFile('./src/data/generations.json', generationData)];
-            case 10:
-                _a.sent();
+            case 14:
+                _b.sent();
                 generationCount = Object.keys(fetchedGenerations).length;
                 console.log(generationCount + " generations saved to file");
-                return [3 /*break*/, 12];
-            case 11:
-                e_3 = _a.sent();
-                console.log(e_3);
-                return [3 /*break*/, 12];
-            case 12: return [2 /*return*/];
+                return [3 /*break*/, 16];
+            case 15:
+                e_4 = _b.sent();
+                console.log(e_4);
+                return [3 /*break*/, 16];
+            case 16: return [2 /*return*/];
         }
     });
 }); };

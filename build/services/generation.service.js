@@ -35,6 +35,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -46,24 +73,34 @@ var generationCache = {
 };
 function createGenerationCache() {
     return __awaiter(this, void 0, void 0, function () {
-        var pokemonGenerationCollection, _loop_1, _i, _a, _b, id, generation;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var pokemonGenerationCollection, _loop_1, _a, _b, _c, id, generation;
+        var e_1, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0:
                     generationCache.isCacheLoaded = false;
                     console.log('--- creating generation cache ---');
                     return [4 /*yield*/, generation_repo_1.default.getAllGenerations()];
                 case 1:
-                    pokemonGenerationCollection = _c.sent();
+                    pokemonGenerationCollection = _e.sent();
                     generationCache.cache = {};
                     _loop_1 = function (id, generation) {
                         generation.pokemon_species.forEach(function (pokemon) {
                             generationCache.cache[pokemon.name] = parseInt(id);
                         });
                     };
-                    for (_i = 0, _a = Object.entries(pokemonGenerationCollection); _i < _a.length; _i++) {
-                        _b = _a[_i], id = _b[0], generation = _b[1];
-                        _loop_1(id, generation);
+                    try {
+                        for (_a = __values(Object.entries(pokemonGenerationCollection)), _b = _a.next(); !_b.done; _b = _a.next()) {
+                            _c = __read(_b.value, 2), id = _c[0], generation = _c[1];
+                            _loop_1(id, generation);
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_b && !_b.done && (_d = _a.return)) _d.call(_a);
+                        }
+                        finally { if (e_1) throw e_1.error; }
                     }
                     generationCache.isCacheLoaded = true;
                     console.log('--- generation cache created ---');

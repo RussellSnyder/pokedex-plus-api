@@ -59,3 +59,9 @@ Scrapes PokeApi for generaiton data in order to enrich pokemon modesl
       If a user calls the pokemon endpoint with speicif query params, the response should be cached to be used the next time a user makes the same call.
 - [ ] Create a swagger for endpoints
 - [ ] write tests for services
+
+
+Get isomprhic
+```
+npm i pokedex-plus-isomorphic
+```

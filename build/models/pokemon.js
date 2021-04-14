@@ -10,6 +10,22 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -57,7 +73,7 @@ var PokemonModel = /** @class */ (function () {
         var main = sprites_1.cleanSprite(mainWithNulls);
         var other = {};
         Object.entries(otherWithNulls).forEach(function (_a) {
-            var key = _a[0], value = _a[1];
+            var _b = __read(_a, 2), key = _b[0], value = _b[1];
             other[key] = sprites_1.cleanSprite(value);
         });
         var versions = {
@@ -71,11 +87,11 @@ var PokemonModel = /** @class */ (function () {
             'generation-viii': {},
         };
         Object.entries(versionsWithNulls).forEach(function (_a) {
-            var generation = _a[0], value = _a[1];
+            var _b = __read(_a, 2), generation = _b[0], value = _b[1];
             var versionSprites = value;
             var generationKey = generation;
             Object.entries(versionSprites).forEach(function (_a) {
-                var version = _a[0], sprite = _a[1];
+                var _b = __read(_a, 2), version = _b[0], sprite = _b[1];
                 var cleanedSprite = sprites_1.cleanSprite(sprite);
                 if (cleanedSprite) {
                     versions[generationKey][version] = cleanedSprite;

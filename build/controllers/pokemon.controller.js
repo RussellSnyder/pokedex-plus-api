@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,32 +46,61 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var util_1 = __importDefault(require("util"));
-var url_functions_1 = require("../isomorphic/url-functions");
 var pokemon_service_1 = __importDefault(require("../services/pokemon.service"));
-function getPokemonList(req) {
+var pokemon_query_param_collection_1 = require("pokedex-plus-isomorphic/lib/query-param-collections/pokemon.query-param-collection");
+var lodash_clone_1 = __importDefault(require("lodash.clone"));
+function getAllPokemon(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var options, pokemon, e_1;
+        var query, queryParamCollections, options, pokemon, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    options = req.query ? url_functions_1.decodePokemonListQueryParams(req.query) : undefined;
-                    console.log('parsed', util_1.default.inspect(options, true, 100));
+                    query = Object.entries(req.query).
+                        map(function (_a) {
+                        var _b;
+                        var _c = __read(_a, 2), key = _c[0], value = _c[1];
+                        return (_b = {}, _b[key] = value.toString(), _b);
+                    })
+                        .reduce(function (prev, curr) { return (__assign(__assign({}, prev), curr)); }, {});
+                    queryParamCollections = [
+                        lodash_clone_1.default(pokemon_query_param_collection_1.filterQueryParamCollection),
+                        lodash_clone_1.default(pokemon_query_param_collection_1.sortQueryParamCollection),
+                        lodash_clone_1.default(pokemon_query_param_collection_1.intervalQueryParamCollection)
+                    ];
+                    queryParamCollections.forEach(function (q) { return q.updateQueryParamsFromSerialized(query); });
+                    options = queryParamCollections.reduce(function (prev, curr) { return (__assign(__assign({}, prev), curr.getActiveQueryParams())); }, {});
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, pokemon_service_1.default.getAllPokemon(options)];
+                    return [4 /*yield*/, pokemon_service_1.default.getPokemon(options)];
                 case 2:
                     pokemon = _a.sent();
-                    return [2 /*return*/, pokemon];
+                    res.send(JSON.stringify(pokemon, null, 2));
+                    return [3 /*break*/, 4];
                 case 3:
                     e_1 = _a.sent();
-                    console.log(e_1);
-                    throw Error('Oh No!');
+                    res.sendStatus(500);
+                    return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
             }
         });
@@ -88,6 +128,6 @@ function getPokemonByName(name) {
 }
 exports.default = {
     getPokemonByName: getPokemonByName,
-    getPokemonList: getPokemonList,
+    getAllPokemon: getAllPokemon,
     getPokemonById: getPokemonById,
 };

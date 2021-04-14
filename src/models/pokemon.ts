@@ -1,19 +1,6 @@
 import { cleanSprite } from '../utils/sprites';
-import {
-  NamedAPIResource,
-  IPokemon,
-  PokemonAbility,
-  PokemonSprite,
-  PokemonSpriteSet,
-  PokemonResponseType,
-  VersionPokemonSprite,
-  PokemonStats,
-  PokemonActions,
-  PokemonPhysicalCharacteristics,
-  PokemonConstructorArguments,
-} from '../isomorphic/types';
-
 import camelCase from 'lodash.camelcase';
+import { IPokemon, NamedAPIResource, PokemonAbility, PokemonActions, PokemonConstructorArguments, PokemonPhysicalCharacteristics, PokemonResponseType, PokemonSprite, PokemonSpriteSet, PokemonStats, VersionPokemonSprite } from 'pokedex-plus-isomorphic/lib/types';
 
 export class PokemonModel implements IPokemon {
   id: number;

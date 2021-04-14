@@ -46,6 +46,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -64,7 +80,7 @@ function createStatCache() {
             switch (_a.label) {
                 case 0:
                     statCache.isCacheLoaded = false;
-                    return [4 /*yield*/, pokemon_service_1.default.getAllPokemon()];
+                    return [4 /*yield*/, pokemon_service_1.default.getPokemon()];
                 case 1:
                     pokemonList = _a.sent();
                     pokemon = pokemonList.results;
@@ -122,7 +138,7 @@ function calculateNormalizedBaseExperience(pokemon) {
         baseExperience: baseExperience,
     };
 }
-function calculatenormalizedStats(pokemon) {
+function calculateNormalizedStats(pokemon) {
     return {
         hp: pokemon.stats.hp
             ? _normalizeValue(pokemon.stats.hp, statCache.cache.hp.min, statCache.cache.hp.max)
@@ -174,13 +190,13 @@ function _calculateNameAndCount(values) {
     // order by count
     return Object.entries(nameAndCount)
         .sort(function (_a, _b) {
-        var a = _a[1];
-        var b = _b[1];
+        var _c = __read(_a, 2), a = _c[1];
+        var _d = __read(_b, 2), b = _d[1];
         return a - b;
     })
         .reduce(function (r, _a) {
         var _b;
-        var k = _a[0], v = _a[1];
+        var _c = __read(_a, 2), k = _c[0], v = _c[1];
         return (__assign(__assign({}, r), (_b = {}, _b[k] = v, _b)));
     }, {});
 }
@@ -188,6 +204,6 @@ exports.default = {
     createStatCache: createStatCache,
     getAllStats: getAllStats,
     calculateNormalizedPhysicalCharacteristics: calculateNormalizedPhysicalCharacteristics,
-    calculatenormalizedStats: calculatenormalizedStats,
+    calculateNormalizedStats: calculateNormalizedStats,
     calculateNormalizedBaseExperience: calculateNormalizedBaseExperience,
 };
