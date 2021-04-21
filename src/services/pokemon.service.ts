@@ -1,11 +1,23 @@
-import { ServiceCache } from '../models/service-cache';
+import {
+  ActivePokemonLabelTypeLookup,
+  FilterQueryParam,
+} from 'pokedex-plus-isomorphic/lib/query-param-collections/pokemon.query-param-collection';
+import {
+  IPokemon,
+  PokemonActions,
+  PokemonJsonFormat,
+  PokemonListResponse,
+  PokemonPhysicalCharacteristics,
+  PokemonStats,
+  SortValue,
+} from 'pokedex-plus-isomorphic/lib/types';
+import { ValueOf } from 'pokedex-plus-isomorphic/lib/util';
 import { PokemonModel } from '../models/pokemon';
+import { ServiceCache } from '../models/service-cache';
 import pokemonRepo from '../repos/pokemon.repo';
 import generationService from './generation.service';
 import statsService from './stats.service';
-import { FilterParam, IPokemon, PokemonJsonFormat, PokemonListOptions, PokemonListResponse } from 'pokedex-plus-isomorphic/lib/types';
-import { getKeyAndValueOfObject } from 'pokedex-plus-isomorphic/lib/util';
-import { filterQueryParamCollection, SortQueryParam } from 'pokedex-plus-isomorphic/lib/query-param-collections/pokemon.query-param-collection';
+import sortBy from 'lodash.sortBy';
 
 export interface PokemonCache {
   [key: number]: IPokemon;
@@ -73,24 +85,24 @@ function addNormalizedData(): void {
 }
 
 async function getPokemon(
-  options?: { [key: string]: any },
+  activeControls?: ActivePokemonLabelTypeLookup,
 ): Promise<PokemonListResponse> {
   const pokemonCache = await _getPokemonCache();
 
-  if (!options) {
+  if (!activeControls) {
     const pokemon = Object.values(pokemonCache);
     return {
       results: pokemon,
       totalResults: pokemon.length,
     };
   }
-  
-  const filteredCache = _filterPokemonList(pokemonCache, options);
-  const sortedCache = _sortPokemonList(filteredCache, options);
+
+  const filteredCache = _filterPokemonList(pokemonCache, activeControls);
+  const sortedCache = _sortPokemonList(filteredCache, activeControls);
 
   const prePaginationLength = Object.keys(sortedCache).length;
 
-  const { limit, offset } = options;
+  const { limit, offset } = activeControls;
 
   if (limit != undefined && limit > prePaginationLength) {
     return {
@@ -98,11 +110,7 @@ async function getPokemon(
       totalResults: prePaginationLength,
     };
   }
-  const pagedCache = _pagePokemonList(
-    sortedCache,
-    limit,
-    offset,
-  );
+  const pagedCache = _pagePokemonList(sortedCache, limit, offset);
 
   const pokemon = Object.values(pagedCache);
 
@@ -151,154 +159,196 @@ function _pagePokemonList(
   );
 }
 
-// TODO interpret type from collection
-function _filterPokemonList(pokemonCache: PokemonCache, options: { [key: string]: any }) {
-  let processedPokemon = [...Object.values(pokemonCache)];
+function _filterPokemonList(
+  pokemonCache: PokemonCache,
+  options: ActivePokemonLabelTypeLookup,
+) {
+  if (!options) {
+    return pokemonCache;
+  }
 
-  // String Lists
-  const type: string[] | undefined = options.type;
+  let processedPokemon: IPokemon[] = [...Object.values(pokemonCache)];
+
+  const type = options[FilterQueryParam.Type];
   if (type) {
-    processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
-    type.every((t: string) => pokemon.types.includes(t)),
-    );
+    processedPokemon = _filterStringList(type, 'types', processedPokemon);
   }
 
-  const ability: string[] | undefined = options.ability;
+  const ability = options[FilterQueryParam.Ability];
   if (ability) {
-    processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
-    ability.every((t: string) => pokemon.actions.abilities.includes(t)),
-    );
+    processedPokemon = _filterAction(ability, 'abilities', processedPokemon);
   }
 
-  const move: string[] | undefined = options.move;
+  const move = options[FilterQueryParam.Move];
   if (move) {
-    processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
-    move.every((t: string) => pokemon.actions.moves.includes(t)),
-    );
+    processedPokemon = _filterAction(move, 'moves', processedPokemon);
   }
 
-  // Booleans
-  const isDefault: boolean | undefined = options.isDefault;
+  const isDefault = options[FilterQueryParam.IsDefault];
   if (isDefault) {
     processedPokemon = processedPokemon.filter(
-      (pokemon: PokemonModel) => pokemon.isDefault === isDefault,
+      pokemon => pokemon.isDefault === isDefault,
     );
   }
 
-  // Number Lists
-  const generation: number[] | undefined = options.generation;
-  if (generation != undefined) {
-    processedPokemon = processedPokemon.filter((pokemon: IPokemon) =>
-      generation.includes(pokemon.generation),
+  const generation = options[FilterQueryParam.Generation];
+  if (generation) {
+    processedPokemon = _filterNumberList(
+      generation,
+      'generation',
+      processedPokemon,
     );
   }
 
-  // Stat Numbers
-  const hpMin: number | undefined = options.hpMin;
+  const hpMin = options[FilterQueryParam.HpMin];
   if (hpMin) {
-    processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.hp && stats.hp >= hpMin,
-    );
+    processedPokemon = _filterByStat(hpMin, 'hp', 'min', processedPokemon);
   }
 
-  const hpMax: number | undefined = options.hpMax;
+  const hpMax = options[FilterQueryParam.HpMax];
   if (hpMax) {
-  processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.hp && stats.hp <= hpMax,
-    );
+    processedPokemon = _filterByStat(hpMax, 'hp', 'max', processedPokemon);
   }
 
-  const speedMin: number | undefined = options.speedMin;
+  const speedMin = options[FilterQueryParam.SpeedMin];
   if (speedMin) {
-    processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.speed && stats.speed >= speedMin,
+    processedPokemon = _filterByStat(
+      speedMin,
+      'speed',
+      'min',
+      processedPokemon,
     );
   }
 
-  const speedMax: number | undefined = options.speedMax;
+  const speedMax = options[FilterQueryParam.SpeedMax];
   if (speedMax) {
-  processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.speed && stats.speed <= speedMax,
+    processedPokemon = _filterByStat(
+      speedMax,
+      'speed',
+      'max',
+      processedPokemon,
     );
   }
 
-  const attackMin: number | undefined = options.attackMin;
+  const attackMin = options[FilterQueryParam.AttackMin];
   if (attackMin) {
-    processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.attack && stats.attack >= attackMin,
+    processedPokemon = _filterByStat(
+      attackMin,
+      'attack',
+      'min',
+      processedPokemon,
     );
   }
 
-  const attackMax: number | undefined = options.attackMax;
+  const attackMax = options[FilterQueryParam.AttackMax];
   if (attackMax) {
-  processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.attack && stats.attack <= attackMax,
+    processedPokemon = _filterByStat(
+      attackMax,
+      'attack',
+      'max',
+      processedPokemon,
     );
   }
 
-  const defenseMin: number | undefined = options.defenseMin;
+  const defenseMin = options[FilterQueryParam.DefenseMin];
   if (defenseMin) {
-    processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.defense && stats.defense >= defenseMin,
+    processedPokemon = _filterByStat(
+      defenseMin,
+      'defense',
+      'min',
+      processedPokemon,
     );
   }
 
-  const defenseMax: number | undefined = options.defenseMax;
+  const defenseMax = options[FilterQueryParam.DefenseMax];
   if (defenseMax) {
-  processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.defense && stats.defense <= defenseMax,
+    processedPokemon = _filterByStat(
+      defenseMax,
+      'defense',
+      'max',
+      processedPokemon,
     );
   }
 
-  const specialAttackMin: number | undefined = options.specialAttackMin;
+  const specialAttackMin = options[FilterQueryParam.SpecialAttackMin];
   if (specialAttackMin) {
-    processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.specialAttack && stats.specialAttack >= specialAttackMin,
+    processedPokemon = _filterByStat(
+      specialAttackMin,
+      'specialAttack',
+      'min',
+      processedPokemon,
     );
   }
 
-  const specialAttackMax: number | undefined = options.specialAttackMax;
+  const specialAttackMax = options[FilterQueryParam.SpecialAttackMax];
   if (specialAttackMax) {
-  processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.specialAttack && stats.specialAttack <= specialAttackMax,
+    processedPokemon = _filterByStat(
+      specialAttackMax,
+      'specialAttack',
+      'max',
+      processedPokemon,
     );
   }
 
-  const specialDefenseMin: number | undefined = options.specialDefenseMin;
+  const specialDefenseMin = options[FilterQueryParam.SpecialDefenseMin];
   if (specialDefenseMin) {
-    processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.specialDefense && stats.specialDefense >= specialDefenseMin,
+    processedPokemon = _filterByStat(
+      specialDefenseMin,
+      'specialDefense',
+      'min',
+      processedPokemon,
     );
   }
 
-  const specialDefenseMax: number | undefined = options.specialDefenseMax;
+  const specialDefenseMax = options[FilterQueryParam.SpecialDefenseMax];
   if (specialDefenseMax) {
-  processedPokemon = processedPokemon.filter(
-      ({ stats }: IPokemon) => stats.specialDefense && stats.specialDefense <= specialDefenseMax,
+    processedPokemon = _filterByStat(
+      specialDefenseMax,
+      'specialDefense',
+      'max',
+      processedPokemon,
     );
   }
 
-  // Numbers
-  const heightMin: number | undefined = options.heightMin;
+  const heightMin = options[FilterQueryParam.HeightMin];
   if (heightMin) {
-    processedPokemon = processedPokemon.filter(({ height }) => height >= heightMin);
+    processedPokemon = _filterByPhysicalCharacteristic(
+      heightMin,
+      'height',
+      'min',
+      processedPokemon,
+    );
   }
 
-  const heightMax: number | undefined = options.heightMax;
+  const heightMax = options[FilterQueryParam.HeightMax];
   if (heightMax) {
-    processedPokemon = processedPokemon.filter(({ height }) => height <= heightMax);
+    processedPokemon = _filterByPhysicalCharacteristic(
+      heightMax,
+      'height',
+      'max',
+      processedPokemon,
+    );
   }
 
-  const weightMin: number | undefined = options.weightMin;
+  const weightMin = options[FilterQueryParam.WeightMin];
   if (weightMin) {
-    processedPokemon = processedPokemon.filter(({ weight }) => weight >= weightMin);
+    processedPokemon = _filterByPhysicalCharacteristic(
+      weightMin,
+      'weight',
+      'min',
+      processedPokemon,
+    );
   }
 
-  const weightMax: number | undefined = options.weightMax;
+  const weightMax = options[FilterQueryParam.WeightMax];
   if (weightMax) {
-    processedPokemon = processedPokemon.filter(({ weight }) => weight <= weightMax);
+    processedPokemon = _filterByPhysicalCharacteristic(
+      weightMax,
+      'weight',
+      'max',
+      processedPokemon,
+    );
   }
-
 
   return Object.entries(processedPokemon).reduce(
     (r, [id, pokemon]) => ({ ...r, [id]: pokemon }),
@@ -306,38 +356,39 @@ function _filterPokemonList(pokemonCache: PokemonCache, options: { [key: string]
   );
 }
 
-function _sortPokemonList(pokemonCache: PokemonCache, sort?: { [key: string]: string }) {
-  if (!sort) {
+function _sortPokemonList(
+  pokemonCache: PokemonCache,
+  options?: ActivePokemonLabelTypeLookup,
+) {
+  if (!options) {
     return pokemonCache;
   }
 
-  const processedPokemon = [...Object.values(pokemonCache)];
+  let processedPokemon = [...Object.values(pokemonCache)];
 
-  // only one sort
-  const [key, value] = getKeyAndValueOfObject(sort);
+  const { name, height, weight } = options;
 
-  switch (key) {
-    case SortQueryParam.Name:
-      if (value === 'asc') {
-        processedPokemon.sort((a, b) => a.name - b.name);
-      } else if (value === 'desc') {
-        processedPokemon.sort((a, b) => b.name - a.name);
-      }
-      break;
-    case SortQueryParam.Height:
-      if (value === 'asc') {
-        processedPokemon.sort((a, b) => a.height - b.height);
-      } else if (value === 'desc') {
-        processedPokemon.sort((a, b) => b.height - a.height);
-      }
-      break;
-    case SortQueryParam.Weight:
-      if (value === 'asc') {
-        processedPokemon.sort((a, b) => a.weight - b.weight);
-      } else if (value === 'desc') {
-        processedPokemon.sort((a, b) => b.weight - a.weight);
-      }
-      break;
+  if (name) {
+    processedPokemon = sortBy(processedPokemon, ['name']);
+    if (name === SortValue.Desc) {
+      processedPokemon.reverse();
+    }
+  }
+  if (weight) {
+    processedPokemon = sortBy(processedPokemon, [
+      'physicalCharacteristics.weight',
+    ]);
+    if (weight === SortValue.Desc) {
+      processedPokemon.reverse();
+    }
+  }
+  if (height) {
+    processedPokemon = sortBy(processedPokemon, [
+      'physicalCharacteristics.height',
+    ]);
+    if (height === SortValue.Desc) {
+      processedPokemon.reverse();
+    }
   }
 
   return Object.entries(processedPokemon).reduce(
@@ -355,6 +406,74 @@ async function _getPokemonCache(): Promise<PokemonCache> {
 
   return pokemonCache.cache;
 }
+
+const _filterStringList = (
+  value: string[],
+  property: keyof IPokemon,
+  pokemonList: IPokemon[],
+): IPokemon[] => {
+  return pokemonList.filter(pokemon =>
+    value.every(t => (pokemon[property] as string[]).includes(t)),
+  );
+};
+
+const _filterNumberList = (
+  value: number[],
+  property: keyof IPokemon,
+  pokemonList: IPokemon[],
+): IPokemon[] => {
+  return pokemonList.filter((pokemon: IPokemon) =>
+    value.every(t => (pokemon[property] as number[]).includes(t)),
+  );
+};
+
+const _filterAction = (
+  value: ValueOf<ActivePokemonLabelTypeLookup>,
+  property: keyof PokemonActions,
+  pokemonList: IPokemon[],
+): IPokemon[] => {
+  return pokemonList.filter((pokemon: IPokemon) =>
+    (value as string[]).every((t: string) =>
+      (pokemon.actions[property] as string[]).includes(t),
+    ),
+  );
+};
+
+const _filterByStat = (
+  value: number,
+  property: keyof PokemonStats,
+  minOfMax: 'min' | 'max',
+  pokemonList: IPokemon[],
+): IPokemon[] => {
+  return pokemonList.filter(({ stats }) => {
+    if (minOfMax === 'min') {
+      return stats[property] && (stats[property] as number) >= value;
+    } else if (minOfMax === 'max') {
+      return stats[property] && (stats[property] as number) <= value;
+    }
+  });
+};
+
+const _filterByPhysicalCharacteristic = (
+  value: number,
+  property: keyof PokemonPhysicalCharacteristics,
+  minOfMax: 'min' | 'max',
+  pokemonList: IPokemon[],
+): IPokemon[] => {
+  return pokemonList.filter(({ physicalCharacteristics }) => {
+    if (minOfMax === 'min') {
+      return (
+        physicalCharacteristics[property] &&
+        (physicalCharacteristics[property] as number) >= value
+      );
+    } else if (minOfMax === 'max') {
+      return (
+        physicalCharacteristics[property] &&
+        (physicalCharacteristics[property] as number) <= value
+      );
+    }
+  });
+};
 
 export default {
   createPokemonCache,

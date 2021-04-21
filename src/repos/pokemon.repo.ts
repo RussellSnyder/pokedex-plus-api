@@ -9,7 +9,7 @@ async function getAllPokemon(): Promise<PokemonJsonFormat[]> {
     const parsed = JSON.parse(rawJson.toString());
     return parsed.pokemon;
   } catch (e) {
-    console.log('could no read pokemon.json', e);
+    console.log('could not read pokemon.json', e);
     return [];
   }
 }

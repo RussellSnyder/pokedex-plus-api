@@ -1,5 +1,13 @@
 import flattenDeep from 'lodash.flattendeep';
-import { AllPokemonStats, IPokemon, PokemonPhysicalCharacteristics, PokemonStats, AllPokemonStat, MathematicalStats, NameAndCount } from 'pokedex-plus-isomorphic/lib/types';
+import {
+  AllPokemonStats,
+  IPokemon,
+  PokemonPhysicalCharacteristics,
+  PokemonStats,
+  AllPokemonStat,
+  MathematicalStats,
+  NameAndCount,
+} from 'pokedex-plus-isomorphic/lib/types';
 import stats from 'stats-lite';
 import { ServiceCache } from '../models/service-cache';
 import pokemonService from '../services/pokemon.service';

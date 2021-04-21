@@ -1,31 +1,42 @@
 import { Request, Response } from 'express';
-import pokemonService from '../services/pokemon.service';
-import { IPokemon, PokemonListResponse } from 'pokedex-plus-isomorphic/lib/types'
-import { filterQueryParamCollection, intervalQueryParamCollection, sortQueryParamCollection } from 'pokedex-plus-isomorphic/lib/query-param-collections/pokemon.query-param-collection'
-import { SerializedQueryParam } from 'pokedex-plus-isomorphic/lib/models/query-param';
 import clone from 'lodash.clone';
+import { SerializedQueryParam } from 'pokedex-plus-isomorphic/lib/models/query-param';
+import {
+  ActivePokemonLabelTypeLookup,
+  filterQueryParamCollection,
+  intervalQueryParamCollection,
+  sortQueryParamCollection,
+} from 'pokedex-plus-isomorphic/lib/query-param-collections/pokemon.query-param-collection';
+
+import { IPokemon } from 'pokedex-plus-isomorphic/lib/types';
+
+import pokemonService from '../services/pokemon.service';
 
 async function getAllPokemon(req: Request, res: Response): Promise<void> {
   // express tries to parse the query which is normally good,
   // but we have our own logic
   // TODO tell express not to parse
-  const query = Object.entries(req.query).
-    map(([key, value]) => ({ [key]: value!.toString() }))
-    .reduce((prev, curr) => ({ ...prev, ...curr }), {}) as SerializedQueryParam
+  const query = Object.entries(req.query)
+    .map(([key, value]) => ({ [key]: value!.toString() }))
+    .reduce((prev, curr) => ({ ...prev, ...curr }), {}) as SerializedQueryParam;
 
   // we want a unique copy for each call
   const queryParamCollections = [
     clone(filterQueryParamCollection),
     clone(sortQueryParamCollection),
-    clone(intervalQueryParamCollection)
-  ]
+    clone(intervalQueryParamCollection),
+  ];
 
+  // each collection will grab the data that it can processes
   queryParamCollections.forEach(q => q.updateQueryParamsFromSerialized(query));
 
-  const options = queryParamCollections.reduce((prev, curr) => ({
-    ...prev,
-    ...curr.getActiveQueryParams()
-  }), {})
+  const options: ActivePokemonLabelTypeLookup = queryParamCollections.reduce(
+    (prev, curr) => ({
+      ...prev,
+      ...curr.getActiveQueryParams(),
+    }),
+    {},
+  );
 
   try {
     const pokemon = await pokemonService.getPokemon(options);
@@ -39,12 +50,12 @@ async function getPokemonById(id: number): Promise<IPokemon> {
   return await pokemonService.getPokemonById(id);
 }
 
-async function getPokemonByName(name: string): Promise<IPokemon> {  
+async function getPokemonByName(name: string): Promise<IPokemon> {
   return await pokemonService.getPokemonByName(name);
 }
 
 export default {
   getPokemonByName,
-  getAllPokemon: getAllPokemon,
+  getAllPokemon,
   getPokemonById,
 };

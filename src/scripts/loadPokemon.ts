@@ -1,7 +1,10 @@
 'use strict';
 import axios from 'axios';
 import fs from 'fs';
-import { GroupNamedAPIResourceResponse, PokeApiPokemonResponse } from 'pokedex-plus-isomorphic/lib/types';
+import {
+  GroupNamedAPIResourceResponse,
+  PokeApiPokemonResponse,
+} from 'pokedex-plus-isomorphic/lib/types';
 import util from 'util';
 
 const writeFile = util.promisify(fs.writeFile);
@@ -70,7 +73,7 @@ const createPokemonJson = async () => {
 
   // github only allows 100mb files
   // remove version groups from moves bc we dont use it anyway
-  const trimmedData = Object.entries(fetchedpokemon).map(([_, p]) => {
+  const trimmedData = Object.entries(fetchedpokemon).map(([, p]) => {
     const moves = p.moves.map(move => move.move);
     return {
       ...p,

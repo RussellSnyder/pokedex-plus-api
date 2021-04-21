@@ -1,4 +1,4 @@
-import { PokemonSprite } from "pokedex-plus-isomorphic/lib/types";
+import { PokemonSprite } from 'pokedex-plus-isomorphic/lib/types';
 
 export function cleanSprite(
   pokemonSprite: PokemonSprite,

@@ -39,11 +39,8 @@ function setupRoutes(): void {
       }
 
       res.send(JSON.stringify(pokemon));
-
-    } catch(e) {
-
+    } catch (e) {
       console.warn(e);
-
     }
   });
 
