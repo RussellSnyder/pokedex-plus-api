@@ -6,6 +6,8 @@ import pokemonService from './services/pokemon.service';
 import statsService from './services/stats.service';
 import cors from 'cors';
 import { IPokemon } from 'pokedex-plus-isomorphic/lib/types';
+import sortService from './services/sort.service';
+import pokemonControlsController from './controllers/pokemon-controls.controller';
 
 const app = express();
 app.use(cors());
@@ -14,47 +16,20 @@ const port = 3000;
 
 function setupRoutes(): void {
   app.get('/api/v1/pokemon', pokemonController.getAllPokemon);
-  app.get('/api/v1/pokemon/:id', async (req: Request, res: Response) => {
-    // could be the id or the name of the pokemon
-    const idOrName = req.params.id as number | string;
+  // could be the id or the name of the pokemon
+  app.get('/api/v1/pokemon/:id', pokemonController.getPokemon);
 
-    if (!idOrName) {
-      res.sendStatus(404);
-    }
+  app.get('/api/v1/stats', statsController.getAllStats);
 
-    let pokemon: IPokemon;
-
-    try {
-      if (isNaN(idOrName as number)) {
-        const name = idOrName as string;
-        pokemon = await pokemonController.getPokemonByName(name);
-      } else {
-        const id = idOrName as number;
-        pokemon = await pokemonController.getPokemonById(id);
-      }
-
-      if (!pokemon) {
-        res.sendStatus(404);
-        return;
-      }
-
-      res.send(JSON.stringify(pokemon));
-    } catch (e) {
-      console.warn(e);
-    }
-  });
-
-  app.get('/api/v1/stats', async (req: Request, res: Response) => {
-    const stats = await statsController.getAllStats();
-
-    res.send(JSON.stringify(stats));
-  });
+  app.get('/api/v1/pokemon-controls/filters', pokemonControlsController.getPokemonFilters)
+  app.get('/api/v1/pokemon-controls/sorts', pokemonControlsController.getPokemonSorts)
 }
 
 app.listen(port, async () => {
   console.log(`Example app listening at http://localhost:${port}`);
   await generationService.createGenerationCache();
   await pokemonService.createPokemonCache();
+  await sortService.createSortCache();
   await statsService.createStatCache();
   pokemonService.addNormalizedData();
 

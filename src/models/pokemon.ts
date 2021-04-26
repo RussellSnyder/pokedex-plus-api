@@ -1,5 +1,5 @@
 import { cleanSprite } from '../utils/sprites';
-import camelCase from 'lodash.camelcase';
+import { camelCase } from 'lodash';
 import {
   IPokemon,
   NamedAPIResource,

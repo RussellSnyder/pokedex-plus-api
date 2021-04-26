@@ -1,4 +1,4 @@
-import flattenDeep from 'lodash.flattendeep';
+import { flattenDeep } from 'lodash';
 import {
   AllPokemonStats,
   IPokemon,

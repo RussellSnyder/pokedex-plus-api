@@ -17,7 +17,7 @@ import { ServiceCache } from '../models/service-cache';
 import pokemonRepo from '../repos/pokemon.repo';
 import generationService from './generation.service';
 import statsService from './stats.service';
-import sortBy from 'lodash.sortBy';
+import { sortBy } from 'lodash';
 
 export interface PokemonCache {
   [key: number]: IPokemon;

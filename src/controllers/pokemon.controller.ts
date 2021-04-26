@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import clone from 'lodash.clone';
+import { clone } from 'lodash';
 import { SerializedQueryParam } from 'pokedex-plus-isomorphic/lib/models/query-param';
 import {
   ActivePokemonLabelTypeLookup,
@@ -46,16 +46,38 @@ async function getAllPokemon(req: Request, res: Response): Promise<void> {
   }
 }
 
-async function getPokemonById(id: number): Promise<IPokemon> {
-  return await pokemonService.getPokemonById(id);
-}
+async function getPokemon(req: Request, res: Response): Promise<void> {
+  // could be the id or the name of the pokemon
+  const idOrName = req.params.id as number | string;
 
-async function getPokemonByName(name: string): Promise<IPokemon> {
-  return await pokemonService.getPokemonByName(name);
+  if (!idOrName) {
+    res.sendStatus(404);
+    return;
+  }
+
+  let pokemon: IPokemon;
+
+  try {
+    if (isNaN(idOrName as number)) {
+      const name = idOrName as string;
+      pokemon = await pokemonService.getPokemonByName(name);
+    } else {
+      const id = idOrName as number;
+      pokemon = await pokemonService.getPokemonById(id);
+    }
+
+    if (!pokemon) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.send(JSON.stringify(pokemon));
+  } catch (e) {
+    res.sendStatus(500);
+  }
 }
 
 export default {
-  getPokemonByName,
   getAllPokemon,
-  getPokemonById,
+  getPokemon,
 };
